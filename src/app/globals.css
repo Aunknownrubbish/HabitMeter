@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #3B82F6;
+  --color-primary-light: #EFF6FF;
+  --color-primary-dark: #2563EB;
+  --color-bg-page: #F0F7FF;
+  --color-text-main: #1E293B;
+  --color-text-secondary: #64748B;
+}
+
+/* AMap container height fix */
+.amap-container {
+  height: 100% !important;
+}
