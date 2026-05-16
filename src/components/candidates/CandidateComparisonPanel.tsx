@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { Card } from "@/components/ui/Card";
 import { loadCandidates } from "@/lib/candidates";
 import {
@@ -39,16 +39,22 @@ const STATUS_LABELS: Record<string, string> = {
 export function CandidateComparisonPanel({
   refreshKey,
 }: CandidateComparisonPanelProps) {
-  const [preferenceMode, setPreferenceMode] = useState<PreferenceMode>(
-    () => loadPreferenceMode()
-  );
+  const [preferenceMode, setPreferenceMode] = useState<PreferenceMode>("balanced");
+  const [candidates, setCandidates] = useState<ReturnType<typeof loadCandidates>>([]);
+
+  useEffect(() => {
+    setPreferenceMode(loadPreferenceMode());
+  }, []);
+
+  useEffect(() => {
+    setCandidates(loadCandidates());
+  }, [refreshKey]);
 
   const handleModeChange = useCallback((mode: PreferenceMode) => {
     setPreferenceMode(mode);
     savePreferenceMode(mode);
   }, []);
 
-  const candidates = useMemo(() => loadCandidates(), [refreshKey]);
   const result = useMemo(
     () => compareCandidates(candidates, preferenceMode),
     [candidates, preferenceMode]

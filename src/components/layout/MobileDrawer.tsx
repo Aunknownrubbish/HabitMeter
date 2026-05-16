@@ -286,6 +286,7 @@ export function MobileDrawer({ open, onClose, ...props }: MobileDrawerProps) {
                 poiResults={poiResults}
                 onSelectCandidate={onSelectCandidate}
                 onCandidatesChange={onCandidatesChange}
+                refreshKey={candidateVersion}
               />
               <CandidateComparisonPanel refreshKey={candidateVersion} />
             </div>

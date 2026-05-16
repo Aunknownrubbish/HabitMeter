@@ -145,6 +145,7 @@ export function Sidebar({ className = "", ...props }: SidebarProps) {
           poiResults={poiResults}
           onSelectCandidate={onSelectCandidate}
           onCandidatesChange={onCandidatesChange}
+          refreshKey={candidateVersion}
         />
 
         {/* Candidate Comparison */}
@@ -153,4 +154,3 @@ export function Sidebar({ className = "", ...props }: SidebarProps) {
     </aside>
   );
 }
-

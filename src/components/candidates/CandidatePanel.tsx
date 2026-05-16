@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -31,6 +31,7 @@ interface CandidatePanelProps {
   poiResults: Record<POICategory, POIItem[]>;
   onSelectCandidate?: (candidate: CandidateLocation) => void;
   onCandidatesChange?: () => void;
+  refreshKey?: number;
 }
 
 const STATUS_OPTIONS: { value: CandidateStatus; label: string }[] = [
@@ -62,10 +63,9 @@ export function CandidatePanel({
   poiResults,
   onSelectCandidate,
   onCandidatesChange,
+  refreshKey,
 }: CandidatePanelProps) {
-  const [candidates, setCandidates] = useState<CandidateLocation[]>(() =>
-    loadCandidates()
-  );
+  const [candidates, setCandidates] = useState<CandidateLocation[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
   const [note, setNote] = useState("");
@@ -75,6 +75,10 @@ export function CandidatePanel({
   const refreshCandidates = useCallback(() => {
     setCandidates(loadCandidates());
   }, []);
+
+  useEffect(() => {
+    refreshCandidates();
+  }, [refreshCandidates, refreshKey]);
 
   const handleAdd = () => {
     if (!addressA || !livingScore) return;
@@ -112,24 +116,6 @@ export function CandidatePanel({
     onSelectCandidate?.(c);
   };
 
-  // No address A — empty state
-  if (!addressA) {
-    return (
-      <Card>
-        <h2 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-slate-800">
-          <Layers className="h-4 w-4 text-[var(--color-primary)]" />
-          候选清单
-        </h2>
-        <p className="text-sm text-slate-400">
-          输入居住地后，可加入候选清单进行对比。
-        </p>
-        <p className="mt-1 text-[11px] text-slate-400">
-          候选清单保存在当前浏览器。
-        </p>
-      </Card>
-    );
-  }
-
   return (
     <Card>
       <h2 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-slate-800">
@@ -146,7 +132,11 @@ export function CandidatePanel({
       )}
 
       {/* Add candidate form */}
-      {!showForm ? (
+      {!addressA ? (
+        <p className="mb-3 text-sm text-slate-400">
+          输入居住地后，可加入候选清单进行对比。
+        </p>
+      ) : !showForm ? (
         <Button
           variant="secondary"
           size="sm"
