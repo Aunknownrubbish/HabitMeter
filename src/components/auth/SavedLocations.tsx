@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useCallback } from "react";
 import type { Session } from "next-auth";
+import type { LivingScore } from "@/lib/living-score";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Bookmark, Trash2, MapPin, Plus, X } from "lucide-react";
+import { Bookmark, Trash2, MapPin, Plus, X, Star } from "lucide-react";
 
 interface SavedLocation {
   id: string;
@@ -18,12 +19,21 @@ interface SavedLocation {
 interface SavedLocationsProps {
   session: Session | null;
   currentAddressA: { lat: number; lng: number; name: string } | null;
+  currentScore?: LivingScore | null;
   onSelect: (location: { lat: number; lng: number; name: string }) => void;
 }
+
+const LEVEL_LABEL_C: Record<string, string> = {
+  excellent: "很推荐",
+  good: "推荐",
+  average: "一般",
+  weak: "谨慎",
+};
 
 export function SavedLocations({
   session,
   currentAddressA,
+  currentScore,
   onSelect,
 }: SavedLocationsProps) {
   const [locations, setLocations] = useState<SavedLocation[]>([]);
@@ -77,6 +87,7 @@ export function SavedLocations({
   };
 
   const handleDelete = async (id: string) => {
+    if (!window.confirm("确定删除这个收藏地址吗？")) return;
     setError("");
     try {
       const res = await fetch(`/api/locations/${id}`, { method: "DELETE" });
@@ -131,12 +142,21 @@ export function SavedLocations({
                       <X className="h-3.5 w-3.5" />
                     </button>
                   </div>
+                  {currentScore && (
+                    <div className="flex items-center gap-1.5 rounded bg-[var(--color-primary-light)] px-2 py-1 text-xs">
+                      <Star className="h-3 w-3 text-[var(--color-primary)]" />
+                      <span className="text-slate-600">
+                        当前分析：{currentScore.total}分 ·{" "}
+                        {LEVEL_LABEL_C[currentScore.level] ?? ""}
+                      </span>
+                    </div>
+                  )}
                   <p className="text-xs text-slate-500 truncate">
                     {currentAddressA.name}
                   </p>
                   <div className="flex gap-2">
                     <Input
-                      placeholder="给这个地址起个名字"
+                      placeholder="小区名 / 房源名 / 备选区域"
                       value={saveName}
                       onChange={(e) => setSaveName(e.target.value)}
                       className="flex-1"
@@ -149,6 +169,9 @@ export function SavedLocations({
                       {saving ? "..." : "保存"}
                     </Button>
                   </div>
+                  <p className="text-[10px] text-slate-400">
+                    当前分析分数不会随收藏保存，后续版本将支持候选对比。
+                  </p>
                 </div>
               )}
             </div>

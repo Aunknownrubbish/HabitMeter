@@ -123,6 +123,7 @@ export function Sidebar({ className = "", ...props }: SidebarProps) {
         <SavedLocations
           session={session}
           currentAddressA={addressA}
+          currentScore={livingScore}
           onSelect={onSelectLocation}
         />
       </div>

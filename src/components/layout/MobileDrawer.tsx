@@ -258,6 +258,7 @@ export function MobileDrawer({ open, onClose, ...props }: MobileDrawerProps) {
               <SavedLocations
                 session={session}
                 currentAddressA={addressA}
+                currentScore={livingScore}
                 onSelect={(loc) => {
                   onSelectLocation(loc);
                   setActiveTab("search");
