@@ -1,5 +1,6 @@
 import type { Session } from "next-auth";
 import type { LivingScore } from "@/lib/living-score";
+import type { CandidateLocation } from "@/lib/candidates";
 import { AddressInput } from "@/components/search/AddressInput";
 import { POIToggles } from "@/components/search/POIToggles";
 import { CommutePanel } from "@/components/commute/CommutePanel";
@@ -7,6 +8,7 @@ import { AuthPanel } from "@/components/auth/AuthPanel";
 import { SavedLocations } from "@/components/auth/SavedLocations";
 import { LivingSummaryCard } from "@/components/insights/LivingSummaryCard";
 import { POISummaryPanel } from "@/components/poi/POISummaryPanel";
+import { CandidatePanel } from "@/components/candidates/CandidatePanel";
 import { Card } from "@/components/ui/Card";
 import { type POICategory, type POIItem, type CommuteResult } from "@/types";
 
@@ -26,6 +28,7 @@ interface SidebarProps {
   commuteError: string;
   livingScore: LivingScore | null;
   onSelectLocation: (v: { lat: number; lng: number; name: string }) => void;
+  onSelectCandidate?: (candidate: CandidateLocation) => void;
 }
 
 export function Sidebar({ className = "", ...props }: SidebarProps) {
@@ -44,6 +47,7 @@ export function Sidebar({ className = "", ...props }: SidebarProps) {
     commuteError,
     livingScore,
     onSelectLocation,
+    onSelectCandidate,
   } = props;
 
   return (
@@ -125,6 +129,16 @@ export function Sidebar({ className = "", ...props }: SidebarProps) {
           currentAddressA={addressA}
           currentScore={livingScore}
           onSelect={onSelectLocation}
+        />
+
+        {/* Candidate Panel */}
+        <CandidatePanel
+          addressA={addressA}
+          addressB={addressB}
+          livingScore={livingScore}
+          commuteResult={commuteResult}
+          poiResults={poiResults}
+          onSelectCandidate={onSelectCandidate}
         />
       </div>
     </aside>

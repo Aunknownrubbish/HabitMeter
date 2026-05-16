@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import type { Session } from "next-auth";
 import type { LivingScore } from "@/lib/living-score";
+import type { CandidateLocation } from "@/lib/candidates";
 import { AddressInput } from "@/components/search/AddressInput";
 import { POIToggles } from "@/components/search/POIToggles";
 import { CommutePanel } from "@/components/commute/CommutePanel";
@@ -10,6 +11,7 @@ import { AuthPanel } from "@/components/auth/AuthPanel";
 import { SavedLocations } from "@/components/auth/SavedLocations";
 import { LivingSummaryCard } from "@/components/insights/LivingSummaryCard";
 import { POISummaryPanel } from "@/components/poi/POISummaryPanel";
+import { CandidatePanel } from "@/components/candidates/CandidatePanel";
 import { Card } from "@/components/ui/Card";
 import { POI_CATEGORIES, type POICategory, type POIItem, type CommuteResult } from "@/types";
 import { Search, BarChart3, Bus, Bookmark, ClipboardList } from "lucide-react";
@@ -31,6 +33,7 @@ interface MobileDrawerProps {
   commuteError: string;
   livingScore: LivingScore | null;
   onSelectLocation: (v: { lat: number; lng: number; name: string }) => void;
+  onSelectCandidate?: (candidate: CandidateLocation) => void;
 }
 
 const SNAP_POINTS = [0.15, 0.5, 0.9]; // peek, half, full
@@ -51,6 +54,7 @@ export function MobileDrawer({ open, onClose, ...props }: MobileDrawerProps) {
     commuteError,
     livingScore,
     onSelectLocation,
+    onSelectCandidate,
   } = props;
 
   const [heightRatio, setHeightRatio] = useState(SNAP_POINTS[1]);
@@ -268,6 +272,14 @@ export function MobileDrawer({ open, onClose, ...props }: MobileDrawerProps) {
                   onSelectLocation(loc);
                   setActiveTab("search");
                 }}
+              />
+              <CandidatePanel
+                addressA={addressA}
+                addressB={addressB}
+                livingScore={livingScore}
+                commuteResult={commuteResult}
+                poiResults={poiResults}
+                onSelectCandidate={onSelectCandidate}
               />
             </div>
           )}

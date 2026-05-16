@@ -6,6 +6,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { MobileDrawer } from "@/components/layout/MobileDrawer";
 import { MapContainer } from "@/components/map/MapContainer";
 import { calculateLivingScore } from "@/lib/living-score";
+import type { CandidateLocation } from "@/lib/candidates";
 import type { POICategory, POIItem, CommuteResult } from "@/types";
 import { POI_CATEGORIES } from "@/types";
 
@@ -72,6 +73,22 @@ export default function Home() {
     setAddressA(loc);
   }, []);
 
+  const handleSelectCandidate = useCallback((candidate: CandidateLocation) => {
+    setAddressA({
+      lat: candidate.addressA.lat,
+      lng: candidate.addressA.lng,
+      name: candidate.addressA.name,
+    });
+    if (candidate.addressB) {
+      setAddressB({
+        lat: candidate.addressB.lat,
+        lng: candidate.addressB.lng,
+        name: candidate.addressB.name,
+      });
+    }
+    setCommuteError("");
+  }, []);
+
   const poiCount = Object.values(poiResults).reduce(
     (sum, arr) => sum + (arr?.length ?? 0),
     0
@@ -103,6 +120,7 @@ export default function Home() {
     commuteError,
     livingScore,
     onSelectLocation: handleSelectLocation,
+    onSelectCandidate: handleSelectCandidate,
   };
 
   return (
