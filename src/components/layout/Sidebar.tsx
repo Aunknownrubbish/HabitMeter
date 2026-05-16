@@ -20,6 +20,7 @@ interface SidebarProps {
   poiCount: number;
   commuteResult: CommuteResult;
   commuteLoading: boolean;
+  commuteError: string;
   onSelectLocation: (v: { lat: number; lng: number; name: string }) => void;
 }
 
@@ -44,6 +45,7 @@ export function Sidebar({ className = "", ...props }: SidebarProps) {
     poiCount,
     commuteResult,
     commuteLoading,
+    commuteError,
     onSelectLocation,
   } = props;
 
@@ -171,6 +173,7 @@ export function Sidebar({ className = "", ...props }: SidebarProps) {
           walking={commuteResult.walking}
           riding={commuteResult.riding}
           loading={commuteLoading}
+          error={commuteError}
           addressAName={addressA?.name}
           addressBName={addressB?.name}
         />

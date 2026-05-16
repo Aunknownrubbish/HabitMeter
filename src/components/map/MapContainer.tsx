@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { loadAMap } from "@/lib/amap";
 import type {
   POICategory,
@@ -20,6 +20,7 @@ interface MapContainerProps {
   enabledCategories: Set<POICategory>;
   onPOIResults: (results: Record<POICategory, POIItem[]>) => void;
   onCommuteResult: (result: Partial<CommuteResult>) => void;
+  onCommuteError?: (message: string) => void;
   onMapReady: (map: any) => void;
 }
 
@@ -29,8 +30,10 @@ export function MapContainer({
   enabledCategories,
   onPOIResults,
   onCommuteResult,
+  onCommuteError,
   onMapReady,
 }: MapContainerProps) {
+  const [mapError, setMapError] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
   const circleRef = useRef<any>(null);
@@ -133,19 +136,23 @@ export function MapContainer({
   useEffect(() => {
     let cancelled = false;
 
-    loadAMap().then((AMap) => {
-      if (cancelled || !containerRef.current) return;
+    loadAMap()
+      .then((AMap) => {
+        if (cancelled || !containerRef.current) return;
 
-      const map = new AMap.Map(containerRef.current, {
-        zoom: 11,
-        center: [116.397428, 39.90923],
-        mapStyle: "amap://styles/light",
-        resizeEnable: true,
+        const map = new AMap.Map(containerRef.current, {
+          zoom: 11,
+          center: [116.397428, 39.90923],
+          mapStyle: "amap://styles/light",
+          resizeEnable: true,
+        });
+
+        mapRef.current = map;
+        onMapReady(map);
+      })
+      .catch(() => {
+        if (!cancelled) setMapError(true);
       });
-
-      mapRef.current = map;
-      onMapReady(map);
-    });
 
     return () => {
       cancelled = true;
@@ -225,6 +232,17 @@ export function MapContainer({
       const origin = `${addressA.lng},${addressA.lat}`;
       const dest = `${addressB.lng},${addressB.lat}`;
 
+      let routeCompleted = 0;
+      let anyRouteSuccess = false;
+
+      function trackRouteDone(hadResult: boolean) {
+        if (hadResult) anyRouteSuccess = true;
+        routeCompleted++;
+        if (routeCompleted === 4 && !anyRouteSuccess) {
+          onCommuteError?.("路线获取失败，请稍后重试");
+        }
+      }
+
       // --- Driving ---
       fetch(
         `/api/route/driving?origin=${origin}&destination=${dest}`
@@ -242,9 +260,12 @@ export function MapContainer({
                 summary: `约${formatDuration(parseInt(p.duration))} | ${formatDist(parseInt(p.distance))}`,
               },
             });
+            trackRouteDone(true);
+          } else {
+            trackRouteDone(false);
           }
         })
-        .catch(() => {});
+        .catch(() => { trackRouteDone(false); });
 
       // --- Transit ---
       fetch(
@@ -292,9 +313,12 @@ export function MapContainer({
                 summary: `约${formatDuration(parseInt(t.duration || 0))} | ${formatDist(parseInt(t.distance || 0))}`,
               },
             });
+            trackRouteDone(true);
+          } else {
+            trackRouteDone(false);
           }
         })
-        .catch(() => {});
+        .catch(() => { trackRouteDone(false); });
 
       // --- Walking ---
       fetch(
@@ -314,9 +338,12 @@ export function MapContainer({
                 summary: `约${formatDuration(parseInt(p.duration))} | ${formatDist(parseInt(p.distance))}`,
               },
             });
+            trackRouteDone(true);
+          } else {
+            trackRouteDone(false);
           }
         })
-        .catch(() => {});
+        .catch(() => { trackRouteDone(false); });
 
       // --- Riding ---
       fetch(
@@ -334,11 +361,22 @@ export function MapContainer({
                 summary: `约${formatDuration(parseInt(p.duration))} | ${formatDist(parseInt(p.distance))}`,
               },
             });
+            trackRouteDone(true);
+          } else {
+            trackRouteDone(false);
           }
         })
-        .catch(() => {});
+        .catch(() => { trackRouteDone(false); });
     });
   }, [addressB, addressA, clearRoutes, onCommuteResult]);
+
+  if (mapError) {
+    return (
+      <div className="flex h-full w-full items-center justify-center bg-slate-50 text-sm text-slate-400">
+        地图加载失败，请检查网络后刷新重试
+      </div>
+    );
+  }
 
   return <div ref={containerRef} className="h-full w-full" />;
 }

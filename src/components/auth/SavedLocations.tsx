@@ -30,6 +30,7 @@ export function SavedLocations({
   const [showSave, setShowSave] = useState(false);
   const [saveName, setSaveName] = useState("");
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
   const fetchLocations = useCallback(async () => {
     if (!session?.user?.email) return;
@@ -50,28 +51,42 @@ export function SavedLocations({
   const handleSave = async () => {
     if (!currentAddressA || !saveName.trim()) return;
     setSaving(true);
-    const res = await fetch("/api/locations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: saveName.trim(),
-        address: currentAddressA.name,
-        lat: currentAddressA.lat,
-        lng: currentAddressA.lng,
-      }),
-    });
-    if (res.ok) {
-      setSaveName("");
-      setShowSave(false);
-      fetchLocations();
+    setError("");
+    try {
+      const res = await fetch("/api/locations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: saveName.trim(),
+          address: currentAddressA.name,
+          lat: currentAddressA.lat,
+          lng: currentAddressA.lng,
+        }),
+      });
+      if (res.ok) {
+        setSaveName("");
+        setShowSave(false);
+        fetchLocations();
+      } else {
+        setError("保存失败，请稍后重试");
+      }
+    } catch {
+      setError("保存失败，请稍后重试");
     }
     setSaving(false);
   };
 
   const handleDelete = async (id: string) => {
-    const res = await fetch(`/api/locations/${id}`, { method: "DELETE" });
-    if (res.ok) {
-      setLocations((prev) => prev.filter((l) => l.id !== id));
+    setError("");
+    try {
+      const res = await fetch(`/api/locations/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setLocations((prev) => prev.filter((l) => l.id !== id));
+      } else {
+        setError("删除失败，请稍后重试");
+      }
+    } catch {
+      setError("删除失败，请稍后重试");
     }
   };
 
@@ -81,6 +96,10 @@ export function SavedLocations({
         <Bookmark className="h-4 w-4 text-[var(--color-primary)]" />
         我的收藏
       </h2>
+
+      {error && (
+        <p className="mb-2 text-xs text-red-500">{error}</p>
+      )}
 
       {!session?.user ? (
         <p className="text-sm text-slate-400">登录后可收藏地址</p>

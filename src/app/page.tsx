@@ -33,6 +33,7 @@ export default function Home() {
     riding: null,
   });
   const [commuteLoading, setCommuteLoading] = useState(false);
+  const [commuteError, setCommuteError] = useState("");
 
   const handleCommuteResult = useCallback((result: Partial<CommuteResult>) => {
     setCommuteResult((prev) => ({
@@ -43,12 +44,19 @@ export default function Home() {
     }));
     if (result.transit || result.driving || result.walking || result.riding) {
       setCommuteLoading(false);
+      setCommuteError("");
     }
+  }, []);
+
+  const handleCommuteError = useCallback((message: string) => {
+    setCommuteLoading(false);
+    setCommuteError(message);
   }, []);
 
   const handleAddressBChange = useCallback(
     (v: Address | null) => {
       setAddressB(v);
+      setCommuteError("");
       if (v && addressA) {
         setCommuteLoading(true);
         setCommuteResult({ transit: null, driving: null, walking: null, riding: null });
@@ -80,6 +88,7 @@ export default function Home() {
     poiCount,
     commuteResult,
     commuteLoading,
+    commuteError,
     onSelectLocation: handleSelectLocation,
   };
 
@@ -114,6 +123,7 @@ export default function Home() {
           enabledCategories={enabledCategories}
           onPOIResults={setPOIResults}
           onCommuteResult={handleCommuteResult}
+          onCommuteError={handleCommuteError}
           onMapReady={setMapInstance}
         />
       </main>

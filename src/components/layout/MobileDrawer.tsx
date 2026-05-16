@@ -25,6 +25,7 @@ interface MobileDrawerProps {
   poiCount: number;
   commuteResult: CommuteResult;
   commuteLoading: boolean;
+  commuteError: string;
   onSelectLocation: (v: { lat: number; lng: number; name: string }) => void;
 }
 
@@ -51,6 +52,7 @@ export function MobileDrawer({ open, onClose, ...props }: MobileDrawerProps) {
     poiCount,
     commuteResult,
     commuteLoading,
+    commuteError,
     onSelectLocation,
   } = props;
 
@@ -294,6 +296,7 @@ export function MobileDrawer({ open, onClose, ...props }: MobileDrawerProps) {
                 walking={commuteResult.walking}
                 riding={commuteResult.riding}
                 loading={commuteLoading}
+                error={commuteError}
                 addressAName={addressA?.name}
                 addressBName={addressB?.name}
               />

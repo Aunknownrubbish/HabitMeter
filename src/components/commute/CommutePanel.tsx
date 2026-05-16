@@ -8,6 +8,7 @@ interface CommutePanelProps {
   walking: WalkingInfo | null;
   riding: RidingInfo | null;
   loading: boolean;
+  error?: string;
   addressAName?: string;
   addressBName?: string;
 }
@@ -18,6 +19,7 @@ export function CommutePanel({
   walking,
   riding,
   loading,
+  error,
   addressAName,
   addressBName,
 }: CommutePanelProps) {
@@ -35,6 +37,8 @@ export function CommutePanel({
             <div key={i} className="h-12 animate-pulse rounded-lg bg-slate-100" />
           ))}
         </div>
+      ) : error ? (
+        <p className="text-sm text-red-500">{error}</p>
       ) : !hasAnyResult ? (
         <p className="text-sm text-slate-400">正在计算路线...</p>
       ) : (

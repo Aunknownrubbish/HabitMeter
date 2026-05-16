@@ -23,6 +23,7 @@ export function AddressInput({
   >([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [noResults, setNoResults] = useState(false);
   const autoCompleteRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -52,10 +53,12 @@ export function AddressInput({
       if (!text.trim() || !autoCompleteRef.current) {
         setSuggestions([]);
         setShowSuggestions(false);
+        setNoResults(false);
         return;
       }
 
       setLoading(true);
+      setNoResults(false);
       autoCompleteRef.current.search(text, (status: string, result: any) => {
         setLoading(false);
         if (status === "complete" && result.tips) {
@@ -72,9 +75,11 @@ export function AddressInput({
             }));
           setSuggestions(tips);
           setShowSuggestions(tips.length > 0);
+          setNoResults(tips.length === 0);
         } else {
           setSuggestions([]);
           setShowSuggestions(false);
+          setNoResults(true);
         }
       });
     },
@@ -90,6 +95,7 @@ export function AddressInput({
     setInputValue(s.name);
     setSuggestions([]);
     setShowSuggestions(false);
+    setNoResults(false);
     onChange({ name: s.name, lat: s.lat, lng: s.lng });
   };
 
@@ -123,6 +129,10 @@ export function AddressInput({
           <div className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin rounded-full border-2 border-slate-300 border-t-[var(--color-primary)]" />
         )}
       </div>
+
+      {noResults && (
+        <p className="mt-1 text-xs text-slate-400">未找到相关地址</p>
+      )}
 
       {/* Suggestions dropdown */}
       {showSuggestions && (
