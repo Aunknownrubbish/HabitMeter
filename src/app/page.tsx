@@ -34,7 +34,7 @@ export default function Home() {
   });
   const [commuteLoading, setCommuteLoading] = useState(false);
 
-  const handleCommuteResult = useCallback((result: CommuteResult) => {
+  const handleCommuteResult = useCallback((result: Partial<CommuteResult>) => {
     setCommuteResult((prev) => ({
       transit: result.transit ?? prev.transit,
       driving: result.driving ?? prev.driving,
