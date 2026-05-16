@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
+import type { Session } from "next-auth";
 import { AddressInput } from "@/components/search/AddressInput";
 import { POIToggles } from "@/components/search/POIToggles";
 import { CommutePanel } from "@/components/commute/CommutePanel";
@@ -13,7 +14,7 @@ import { Search, BarChart3, Bus, Bookmark, User } from "lucide-react";
 interface MobileDrawerProps {
   open: boolean;
   onClose: () => void;
-  session: { user?: { email?: string; name?: string } } | null;
+  session: Session | null;
   addressA: { lat: number; lng: number; name: string } | null;
   setAddressA: (v: { lat: number; lng: number; name: string } | null) => void;
   addressB: { lat: number; lng: number; name: string } | null;
@@ -154,7 +155,7 @@ export function MobileDrawer({ open, onClose, ...props }: MobileDrawerProps) {
                 >
                   <Icon className="h-4 w-4" />
                   <span className="text-[10px]">{tab.label}</span>
-                  {tab.badge != null && tab.badge > 0 && (
+                  {"badge" in tab && tab.badge != null && tab.badge > 0 && (
                     <span className="absolute -top-0.5 right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[var(--color-primary)] px-1 text-[10px] font-bold text-white">
                       {tab.badge}
                     </span>

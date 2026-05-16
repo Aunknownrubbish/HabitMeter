@@ -25,7 +25,7 @@ export function AddressInput({
   const [loading, setLoading] = useState(false);
   const autoCompleteRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const blurTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // Sync input value when external value changes
   useEffect(() => {

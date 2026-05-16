@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { signIn, signOut } from "next-auth/react";
+import type { Session } from "next-auth";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
@@ -10,7 +11,7 @@ import { LogIn, LogOut, User, Mail, Lock } from "lucide-react";
 export function AuthPanel({
   session,
 }: {
-  session: { user?: { email?: string; name?: string } } | null;
+  session: Session | null;
 }) {
   const [mode, setMode] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");

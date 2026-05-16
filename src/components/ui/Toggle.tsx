@@ -1,5 +1,5 @@
 interface ToggleProps {
-  label: string;
+  label: React.ReactNode;
   checked: boolean;
   onChange: (checked: boolean) => void;
   disabled?: boolean;

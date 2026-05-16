@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import type { Session } from "next-auth";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -15,7 +16,7 @@ interface SavedLocation {
 }
 
 interface SavedLocationsProps {
-  session: { user?: { email?: string } } | null;
+  session: Session | null;
   currentAddressA: { lat: number; lng: number; name: string } | null;
   onSelect: (location: { lat: number; lng: number; name: string }) => void;
 }

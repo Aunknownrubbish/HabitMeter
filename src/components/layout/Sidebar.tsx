@@ -1,3 +1,4 @@
+import type { Session } from "next-auth";
 import { AddressInput } from "@/components/search/AddressInput";
 import { POIToggles } from "@/components/search/POIToggles";
 import { CommutePanel } from "@/components/commute/CommutePanel";
@@ -8,7 +9,7 @@ import { POI_CATEGORIES, type POICategory, type POIItem, type CommuteResult } fr
 
 interface SidebarProps {
   className?: string;
-  session: { user?: { email?: string; name?: string } } | null;
+  session: Session | null;
   addressA: { lat: number; lng: number; name: string } | null;
   setAddressA: (v: { lat: number; lng: number; name: string } | null) => void;
   addressB: { lat: number; lng: number; name: string } | null;

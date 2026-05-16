@@ -14,7 +14,7 @@ export async function DELETE(
   const { id } = await params;
 
   const location = await db.savedLocation.findUnique({ where: { id } });
-  if (!location || location.userId !== (session.user as any).id) {
+  if (!location || location.userId !== session.user.id) {
     return NextResponse.json({ error: "未找到或无权删除" }, { status: 404 });
   }
 

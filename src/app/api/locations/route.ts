@@ -9,7 +9,7 @@ export async function GET() {
   }
 
   const locations = await db.savedLocation.findMany({
-    where: { userId: (session.user as any).id },
+    where: { userId: session.user.id },
     orderBy: { createdAt: "desc" },
   });
 
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
 
   const location = await db.savedLocation.create({
     data: {
-      userId: (session.user as any).id,
+      userId: session.user.id,
       name,
       address,
       lat,

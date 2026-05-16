@@ -19,7 +19,7 @@ interface MapContainerProps {
   addressB: { lat: number; lng: number; name: string } | null;
   enabledCategories: Set<POICategory>;
   onPOIResults: (results: Record<POICategory, POIItem[]>) => void;
-  onCommuteResult: (result: CommuteResult) => void;
+  onCommuteResult: (result: Partial<CommuteResult>) => void;
   onMapReady: (map: any) => void;
 }
 
@@ -359,50 +359,6 @@ function getCategoryColor(cat: POICategory): string {
   }
 }
 
-function getTrafficLabel(route: any): string {
-  if (route.traffic_status != null) {
-    const map: Record<number, string> = { 0: "未知", 1: "畅通", 2: "缓行", 3: "拥堵", 4: "严重拥堵" };
-    return map[route.traffic_status] || "未知";
-  }
-  return "未知";
-}
-
-function parseTransitSegments(segments: any[]): TransitSegment[] {
-  return segments.map((seg: any) => {
-    // Walking segment (no transit property)
-    if (!seg.transit) {
-      return {
-        type: "walk" as const,
-        name: "步行",
-        distance: seg.distance || seg.walking?.distance || 0,
-        duration: seg.time || seg.walking?.duration || 0,
-        instruction: seg.instruction || `步行 ${formatDist(seg.distance || 0)}`,
-        stations: 0,
-        startStation: "",
-        endStation: "",
-      };
-    }
-
-    // Transit segment (bus/subway/train)
-    const t = seg.transit;
-    const typeStr = String(t.type || "").toUpperCase();
-    const isSubway = typeStr.includes("SUBWAY") || typeStr.includes("地铁");
-    const isTrain = typeStr.includes("TRAIN") || typeStr.includes("火车");
-    const segType = isSubway ? "subway" : isTrain ? "train" : "bus";
-
-    return {
-      type: segType as TransitSegment["type"],
-      name: t.name || "",
-      distance: seg.distance || 0,
-      duration: seg.time || 0,
-      instruction: seg.instruction || `乘坐 ${t.name}`,
-      stations: (t.stops?.length || t.station_count || 0),
-      startStation: t.start?.name || t.departure_stop?.name || "",
-      endStation: t.end?.name || t.arrival_stop?.name || "",
-    };
-  });
-}
-
 function formatDuration(seconds: number): string {
   const mins = Math.round(seconds / 60);
   if (mins < 60) return `${mins}分钟`;
@@ -412,50 +368,4 @@ function formatDuration(seconds: number): string {
 function formatDist(meters: number): string {
   if (meters < 1000) return `${meters}m`;
   return `${(meters / 1000).toFixed(1)}km`;
-}
-
-function drawRouteOnMap(map: any, AMap: any, segments: any[], color: string) {
-  const allPoints: any[] = [];
-  segments.forEach((seg: any) => {
-    const polyline = seg.polyline || seg.walking?.polyline;
-    if (polyline) {
-      polyline.split(";").forEach((pair: string) => {
-        const [lng, lat] = pair.split(",").map(Number);
-        if (!isNaN(lng) && !isNaN(lat)) {
-          allPoints.push(new AMap.LngLat(lng, lat));
-        }
-      });
-    }
-    // Handle bus segments
-    if (seg.bus?.buslines) {
-      seg.bus.buslines.forEach((line: any) => {
-        const pl = line.polyline;
-        if (pl) {
-          pl.split(";").forEach((pair: string) => {
-            const [lng, lat] = pair.split(",").map(Number);
-            if (!isNaN(lng) && !isNaN(lat)) {
-              allPoints.push(new AMap.LngLat(lng, lat));
-            }
-          });
-        }
-      });
-    }
-  });
-
-  if (allPoints.length > 0) {
-    const polyline = new AMap.Polyline({
-      path: allPoints,
-      strokeColor: color,
-      strokeWeight: 5,
-      strokeOpacity: 0.7,
-      lineJoin: "round",
-    });
-    polyline.setMap(map);
-    routeLinesRef.current.push(polyline);
-  }
-}
-
-function safeBtoa(str: string): string {
-  if (typeof window !== "undefined") return window.btoa(str);
-  return "";
 }
