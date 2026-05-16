@@ -2,14 +2,16 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import type { Session } from "next-auth";
+import type { LivingScore } from "@/lib/living-score";
 import { AddressInput } from "@/components/search/AddressInput";
 import { POIToggles } from "@/components/search/POIToggles";
 import { CommutePanel } from "@/components/commute/CommutePanel";
 import { AuthPanel } from "@/components/auth/AuthPanel";
 import { SavedLocations } from "@/components/auth/SavedLocations";
+import { LivingSummaryCard } from "@/components/insights/LivingSummaryCard";
 import { Card } from "@/components/ui/Card";
 import { POI_CATEGORIES, type POICategory, type POIItem, type CommuteResult } from "@/types";
-import { Search, BarChart3, Bus, Bookmark, User } from "lucide-react";
+import { Search, BarChart3, Bus, Bookmark, ClipboardList } from "lucide-react";
 
 interface MobileDrawerProps {
   open: boolean;
@@ -26,6 +28,7 @@ interface MobileDrawerProps {
   commuteResult: CommuteResult;
   commuteLoading: boolean;
   commuteError: string;
+  livingScore: LivingScore | null;
   onSelectLocation: (v: { lat: number; lng: number; name: string }) => void;
 }
 
@@ -53,12 +56,15 @@ export function MobileDrawer({ open, onClose, ...props }: MobileDrawerProps) {
     commuteResult,
     commuteLoading,
     commuteError,
+    livingScore,
     onSelectLocation,
   } = props;
 
   const [heightRatio, setHeightRatio] = useState(SNAP_POINTS[1]);
   const [dragging, setDragging] = useState(false);
-  const [activeTab, setActiveTab] = useState<"search" | "stats" | "commute" | "saved">("search");
+  const [activeTab, setActiveTab] = useState<
+    "search" | "stats" | "commute" | "saved" | "conclusion"
+  >("search");
   const drawerRef = useRef<HTMLDivElement>(null);
   const startYRef = useRef(0);
   const startHeightRef = useRef(0);
@@ -107,6 +113,7 @@ export function MobileDrawer({ open, onClose, ...props }: MobileDrawerProps) {
 
   const tabs = [
     { key: "search", icon: Search, label: "搜索" },
+    { key: "conclusion", icon: ClipboardList, label: "结论" },
     { key: "stats", icon: BarChart3, label: "配套", badge: addressA ? poiCount : null },
     { key: "commute", icon: Bus, label: "通勤" },
     { key: "saved", icon: Bookmark, label: session ? "收藏" : "登录" },
@@ -202,6 +209,18 @@ export function MobileDrawer({ open, onClose, ...props }: MobileDrawerProps) {
                   />
                 </div>
               </Card>
+            </div>
+          )}
+
+          {/* Conclusion Tab */}
+          {activeTab === "conclusion" && (
+            <div className="space-y-4 pt-3">
+              <LivingSummaryCard
+                score={livingScore}
+                addressAName={addressA?.name}
+                addressBName={addressB?.name}
+                loading={commuteLoading}
+              />
             </div>
           )}
 

@@ -1,9 +1,11 @@
 import type { Session } from "next-auth";
+import type { LivingScore } from "@/lib/living-score";
 import { AddressInput } from "@/components/search/AddressInput";
 import { POIToggles } from "@/components/search/POIToggles";
 import { CommutePanel } from "@/components/commute/CommutePanel";
 import { AuthPanel } from "@/components/auth/AuthPanel";
 import { SavedLocations } from "@/components/auth/SavedLocations";
+import { LivingSummaryCard } from "@/components/insights/LivingSummaryCard";
 import { Card } from "@/components/ui/Card";
 import { POI_CATEGORIES, type POICategory, type POIItem, type CommuteResult } from "@/types";
 
@@ -21,6 +23,7 @@ interface SidebarProps {
   commuteResult: CommuteResult;
   commuteLoading: boolean;
   commuteError: string;
+  livingScore: LivingScore | null;
   onSelectLocation: (v: { lat: number; lng: number; name: string }) => void;
 }
 
@@ -46,6 +49,7 @@ export function Sidebar({ className = "", ...props }: SidebarProps) {
     commuteResult,
     commuteLoading,
     commuteError,
+    livingScore,
     onSelectLocation,
   } = props;
 
@@ -94,6 +98,14 @@ export function Sidebar({ className = "", ...props }: SidebarProps) {
             />
           </div>
         </Card>
+
+        {/* Living Score Summary */}
+        <LivingSummaryCard
+          score={livingScore}
+          addressAName={addressA?.name}
+          addressBName={addressB?.name}
+          loading={commuteLoading}
+        />
 
         {/* Stats Panel */}
         {addressA && (

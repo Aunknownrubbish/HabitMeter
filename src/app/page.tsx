@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { MobileDrawer } from "@/components/layout/MobileDrawer";
 import { MapContainer } from "@/components/map/MapContainer";
+import { calculateLivingScore } from "@/lib/living-score";
 import type { POICategory, POIItem, CommuteResult } from "@/types";
 import { POI_CATEGORIES } from "@/types";
 
@@ -76,6 +77,17 @@ export default function Home() {
     0
   );
 
+  const livingScore = useMemo(
+    () =>
+      calculateLivingScore({
+        poiResults,
+        commuteResult,
+        addressA,
+        addressB,
+      }),
+    [poiResults, commuteResult, addressA, addressB]
+  );
+
   const sidebarProps = {
     session,
     addressA,
@@ -89,6 +101,7 @@ export default function Home() {
     commuteResult,
     commuteLoading,
     commuteError,
+    livingScore,
     onSelectLocation: handleSelectLocation,
   };
 
