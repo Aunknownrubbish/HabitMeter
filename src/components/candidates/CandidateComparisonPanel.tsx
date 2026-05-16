@@ -13,7 +13,8 @@ import {
   savePreferenceMode,
   type PreferenceMode,
 } from "@/lib/preference-weights";
-import { Trophy, AlertTriangle, ChevronRight, SlidersHorizontal } from "lucide-react";
+import { buildComparisonReport } from "@/lib/comparison-report";
+import { Trophy, AlertTriangle, ChevronRight, Copy } from "lucide-react";
 
 interface CandidateComparisonPanelProps {
   refreshKey?: number;
@@ -55,6 +56,18 @@ export function CandidateComparisonPanel({
 
   const modeLabel = PREFERENCE_PRESETS[preferenceMode]?.label ?? "均衡";
   const isCustomMode = preferenceMode !== "balanced";
+
+  const [copyMsg, setCopyMsg] = useState("");
+  const handleCopy = useCallback(async () => {
+    const text = buildComparisonReport(result);
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopyMsg("已复制");
+    } catch {
+      setCopyMsg("复制失败，请手动选择内容");
+    }
+    setTimeout(() => setCopyMsg(""), 3000);
+  }, [result]);
 
   // 0 candidates
   if (candidates.length === 0) {
@@ -116,6 +129,24 @@ export function CandidateComparisonPanel({
       <p className="mb-2 text-[10px] text-slate-400">
         当前排序按：{modeLabel}
       </p>
+
+      {/* Copy report */}
+      <button
+        onClick={handleCopy}
+        className="mb-2 flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-600 hover:bg-slate-50 transition-colors"
+      >
+        <Copy className="h-3.5 w-3.5" />
+        复制报告
+      </button>
+      {copyMsg && (
+        <span
+          className={`ml-2 text-xs ${
+            copyMsg === "已复制" ? "text-green-600" : "text-red-500"
+          }`}
+        >
+          {copyMsg}
+        </span>
+      )}
 
       {/* Summary */}
       <p className="mb-2 text-xs text-slate-600">{result.summary}</p>
