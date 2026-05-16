@@ -219,16 +219,15 @@ export function MapContainer({
 
       map.setFitView([markerARef.current, markerBRef.current].filter(Boolean));
 
-      // Route search via AMap REST API (direct browser call)
+      // Route search via local API proxy (AMap key stays server-side)
       if (!addressA) return;
 
       const origin = `${addressA.lng},${addressA.lat}`;
       const dest = `${addressB.lng},${addressB.lat}`;
-      const webKey = "78cd0cbcc2266dd32961ecf33894fa0e";
 
       // --- Driving ---
       fetch(
-        `https://restapi.amap.com/v3/direction/driving?origin=${origin}&destination=${dest}&key=${webKey}&extensions=all`
+        `/api/route/driving?origin=${origin}&destination=${dest}`
       )
         .then((r) => r.json())
         .then((data: any) => {
@@ -249,7 +248,7 @@ export function MapContainer({
 
       // --- Transit ---
       fetch(
-        `https://restapi.amap.com/v3/direction/transit/integrated?origin=${origin}&destination=${dest}&key=${webKey}&city=${encodeURIComponent(addressB.name)}&extensions=all`
+        `/api/route/transit?origin=${origin}&destination=${dest}&city=${encodeURIComponent(addressB.name)}`
       )
         .then((r) => r.json())
         .then((data: any) => {
@@ -299,7 +298,7 @@ export function MapContainer({
 
       // --- Walking ---
       fetch(
-        `https://restapi.amap.com/v3/direction/walking?origin=${origin}&destination=${dest}&key=${webKey}`
+        `/api/route/walking?origin=${origin}&destination=${dest}`
       )
         .then((r) => r.json())
         .then((data: any) => {
@@ -321,7 +320,7 @@ export function MapContainer({
 
       // --- Riding ---
       fetch(
-        `https://restapi.amap.com/v4/direction/bicycling?origin=${origin}&destination=${dest}&key=${webKey}`
+        `/api/route/riding?origin=${origin}&destination=${dest}`
       )
         .then((r) => r.json())
         .then((data: any) => {

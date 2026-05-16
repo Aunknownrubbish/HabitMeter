@@ -9,16 +9,18 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "缺少参数" }, { status: 400 });
   }
 
-  const key = process.env.AMAP_WEB_KEY!;
+  const key = process.env.AMAP_WEB_KEY;
+  if (!key) {
+    return NextResponse.json({ error: "AMAP_WEB_KEY not configured" }, { status: 500 });
+  }
+
   const url = `https://restapi.amap.com/v3/direction/driving?origin=${origin}&destination=${destination}&key=${key}&extensions=all`;
 
   try {
     const res = await fetch(url);
     const data = await res.json();
-    console.log("Driving API response:", data.status, data.info);
     return NextResponse.json(data);
-  } catch (err) {
-    console.error("Driving API error:", err);
+  } catch {
     return NextResponse.json({ error: "请求失败" }, { status: 500 });
   }
 }
