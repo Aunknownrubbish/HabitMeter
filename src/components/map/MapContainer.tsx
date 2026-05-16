@@ -99,6 +99,8 @@ export function MapContainer({
                   poi.location.lat
                 );
                 const dist = Math.round(center.distance(poiLngLat));
+                if (dist > 3000) return;
+
                 items.push({
                   id: poi.id,
                   name: poi.name,
