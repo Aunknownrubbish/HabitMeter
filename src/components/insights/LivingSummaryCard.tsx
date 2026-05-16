@@ -24,6 +24,8 @@ const BREAKDOWN_BARS: { key: keyof LivingScore["breakdown"]; label: string; max:
   { key: "leisure", label: "休闲", max: 10 },
 ];
 
+const SKELETON_WIDTHS = ["72%", "92%", "58%"];
+
 export function LivingSummaryCard({
   score,
   addressAName,
@@ -40,7 +42,7 @@ export function LivingSummaryCard({
             <div
               key={i}
               className="h-8 animate-pulse rounded bg-slate-100"
-              style={{ width: `${50 + Math.random() * 50}%` }}
+              style={{ width: SKELETON_WIDTHS[i - 1] }}
             />
           ))}
         </div>

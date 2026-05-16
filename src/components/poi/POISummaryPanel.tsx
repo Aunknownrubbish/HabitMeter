@@ -27,6 +27,8 @@ const RATING_STYLE: Record<POIAccessibilitySummary["rating"], { text: string; cl
   none: { text: "暂无", className: "bg-slate-100 text-slate-400" },
 };
 
+const SKELETON_WIDTHS = ["86%", "68%", "92%", "74%", "58%"];
+
 export function POISummaryPanel({ poiResults, poiCount }: POISummaryPanelProps) {
   const summaries = useMemo(() => summarizePOIAccessibility(poiResults), [poiResults]);
 
@@ -121,7 +123,7 @@ function SkeletonLines({ count }: { count: number }) {
         <div
           key={i}
           className="h-5 animate-pulse rounded bg-slate-100"
-          style={{ width: `${60 + Math.random() * 40}%` }}
+          style={{ width: SKELETON_WIDTHS[i % SKELETON_WIDTHS.length] }}
         />
       ))}
     </div>

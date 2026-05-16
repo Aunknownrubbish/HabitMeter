@@ -55,9 +55,9 @@ export function MobileDrawer({ open, onClose, ...props }: MobileDrawerProps) {
 
   const [heightRatio, setHeightRatio] = useState(SNAP_POINTS[1]);
   const [dragging, setDragging] = useState(false);
-  const [activeTab, setActiveTab] = useState<
-    "search" | "stats" | "commute" | "saved" | "conclusion"
-  >("search");
+  type MobileTab = "search" | "stats" | "commute" | "saved" | "conclusion";
+
+  const [activeTab, setActiveTab] = useState<MobileTab>("search");
   const drawerRef = useRef<HTMLDivElement>(null);
   const startYRef = useRef(0);
   const startHeightRef = useRef(0);
@@ -104,13 +104,18 @@ export function MobileDrawer({ open, onClose, ...props }: MobileDrawerProps) {
 
   if (!open) return null;
 
-  const tabs = [
+  const tabs: {
+    key: MobileTab;
+    icon: React.ElementType;
+    label: string;
+    badge?: number | null;
+  }[] = [
     { key: "search", icon: Search, label: "搜索" },
     { key: "conclusion", icon: ClipboardList, label: "结论" },
     { key: "commute", icon: Bus, label: "通勤" },
     { key: "stats", icon: BarChart3, label: "配套", badge: addressA ? poiCount : null },
     { key: "saved", icon: Bookmark, label: session ? "收藏" : "登录" },
-  ] as const;
+  ];
 
   return (
     <>
@@ -148,7 +153,7 @@ export function MobileDrawer({ open, onClose, ...props }: MobileDrawerProps) {
               return (
                 <button
                   key={tab.key}
-                  onClick={() => setActiveTab(tab.key as any)}
+                  onClick={() => setActiveTab(tab.key)}
                   className={`relative flex flex-col items-center gap-0.5 rounded-lg px-3 py-1.5 text-xs transition-colors ${
                     activeTab === tab.key
                       ? "text-[var(--color-primary)]"
@@ -271,4 +276,3 @@ export function MobileDrawer({ open, onClose, ...props }: MobileDrawerProps) {
     </>
   );
 }
-

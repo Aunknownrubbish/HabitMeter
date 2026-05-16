@@ -91,6 +91,21 @@ export function getCommuteRecommendation(
     };
   }
 
+  // Rule 2.5: No useful transit result, but driving is a practical daily option
+  if (drivingMin !== null && (transitMin === null || transitMin > 75) && drivingMin <= 60) {
+    warnings.push("实际耗时可能受高峰路况影响");
+    return {
+      mode: "driving",
+      title: "推荐驾车",
+      reason:
+        transitMin !== null
+          ? `驾车约 ${drivingMin} 分钟，明显短于公共交通`
+          : `驾车约 ${drivingMin} 分钟，是当前较可行的通勤方式`,
+      warnings,
+      alternatives: buildAlternatives("driving"),
+    };
+  }
+
   // Rule 3: Riding ≤ 45 min
   if (ridingMin !== null && ridingMin <= 45) {
     if (ridingMin > 30) {

@@ -15,20 +15,6 @@ interface CommutePanelProps {
   addressBName?: string;
 }
 
-const MODE_ICONS: Record<string, React.ElementType> = {
-  transit: Bus,
-  driving: Car,
-  riding: Bike,
-  walking: Footprints,
-};
-
-const MODE_LABELS: Record<string, string> = {
-  transit: "公共交通",
-  driving: "驾车",
-  riding: "骑行",
-  walking: "步行",
-};
-
 export function CommutePanel({
   transit,
   driving,
