@@ -366,7 +366,7 @@ export function MapContainer({
         })
         .catch(() => { trackRouteDone(false); });
     });
-  }, [addressB, addressA, clearRoutes, onCommuteResult]);
+  }, [addressB, addressA, clearRoutes, onCommuteResult, onCommuteError]);
 
   if (mapError) {
     return (
