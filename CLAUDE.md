@@ -16,6 +16,8 @@
 | 技术规范 | [docs/tech-specs.md](docs/tech-specs.md) | 技术栈、目录结构、Schema、API 设计、环境变量 |
 | 设计规范 | [docs/design-specs.md](docs/design-specs.md) | 配色、字体、组件样式、响应式断点、地图样式 |
 | 执行计划 | [docs/execution-plan.md](docs/execution-plan.md) | 5 阶段任务清单和完成标准 |
+| P0 修复总结 | [docs/P0-fixes-summary.md](docs/P0-fixes-summary.md) | P0-1 ~ P0-6 安全加固与质量修复 |
+| 开发日志 | [dev-logs/2026-05-16.md](dev-logs/2026-05-16.md) | 2026-05-16 详细修改记录 |
 
 ---
 
@@ -42,8 +44,9 @@
 
 ### 高德地图使用
 - JS API 通过 `@amap/amap-jsapi-loader` 异步加载，不通过 `<script>` 标签
-- POI 搜索和路线规划使用 AMap 内置插件，不走服务端 HTTP API
-- API Key 存储在 `.env.local` 的 `NEXT_PUBLIC_AMAP_KEY` 中
+- POI 搜索使用 AMap 内置插件（PlaceSearch, AutoComplete）
+- 路线规划使用 `/api/route/*` 服务端代理，Web Key 不暴露到客户端
+- API Key 存储在 `.env.local`，通过 `src/lib/env.ts` 集中读取
 - 在 AMap 控制台配置域名白名单以保护 Key
 
 ---
@@ -59,9 +62,10 @@
 
 ## 当前状态
 
-- 项目阶段：**5 阶段全部完成 — MVP 交付**
-- 上次工作：2026-05-11 完成移动端可拖拽抽屉、Tab 导航、骨架屏、触摸优化
+- 项目阶段：**5 阶段全部完成 + P0 安全加固 — MVP 交付**
+- 上次工作：2026-05-16 完成 P0-1~P0-6 安全加固与质量修复（Session 类型泛化、路线代理、env 校验、错误状态、POI 3km 口径、dead code 清理）
 - 下一步：配置高德 Key 域名白名单 → 生产部署
 - Node.js 路径：`E:\Develop_Apps\NodeJS\node.exe`
 - npm 路径：`E:\Develop_Apps\NodeJS\npm.cmd`，缓存目录 `C:\Users\X T\.npm-cache`
 - 开发服务器：`npm run dev` → http://localhost:3000
+- Git: 已初始化，当前在 `main` 分支，tag `v1.0.0`

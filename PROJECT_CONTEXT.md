@@ -55,9 +55,11 @@ src/
 ├── lib/
 │   ├── amap.ts                       # 高德地图异步加载 + 密钥配置
 │   ├── auth.ts                       # NextAuth 配置 (Credentials provider, JWT)
-│   └── db.ts                         # Prisma 单例客户端
+│   ├── db.ts                         # Prisma 单例客户端
+│   └── env.ts                        # 环境变量集中校验 (服务端+客户端)
 └── types/
-    └── index.ts                      # POIItem, POICategory, CommuteResult 等类型
+    ├── index.ts                      # POIItem, POICategory, CommuteResult 等类型
+    └── next-auth.d.ts                # NextAuth 模块增强 (Session.user.id)
 ```
 
 组件树（自上而下）:
@@ -80,7 +82,7 @@ src/
 - `User` — id, email (unique), name?, password (bcrypt), locations[], createdAt
 - `SavedLocation` — id, userId (FK→User, cascade), name, address, lat, lng, createdAt
 
-**认证流程**: NextAuth Credentials Provider → bcrypt 密码校验 → JWT session → `(session.user as any).id` 携带 userId。
+**认证流程**: NextAuth Credentials Provider → bcrypt 密码校验 → JWT session → `session.user.id` 携带 userId（通过 `next-auth.d.ts` 模块增强类型安全）。
 
 # API
 
@@ -96,7 +98,7 @@ src/
 | `/api/route/walking` | GET | 高德步行路线代理 (origin, destination) | — |
 | `/api/route/riding` | GET | 高德骑行路线代理 (origin, destination) | — |
 
-> 注意：实际路线请求在 `MapContainer.tsx` 中直接从浏览器发起（使用 `AMAP_WEB_KEY`），`/api/route/*` 代理端点存在但未被前端调用。Proxy 路线可改写为服务端代理以保护 Web 服务 Key。
+> 路线请求已从浏览器直连迁移至 `/api/route/*` 服务端代理。`AMAP_WEB_KEY` 仅存在于服务端，不暴露到客户端。
 
 # 当前功能
 
@@ -115,13 +117,22 @@ src/
 
 # 已知问题
 
-1. **AMAP_WEB_KEY 前端暴露** — `MapContainer.tsx` 中硬编码了 Web 服务 Key (`78cd0cbcc2266dd32961ecf33894fa0e`)，路线请求从浏览器直接发往高德 HTTP API。应改为走 `/api/route/*` 服务端代理，保护 Web Key。
-2. **NEXT_PUBLIC_AMAP_SECRET 前端暴露** — `.env.local` 中 `NEXT_PUBLIC_AMAP_SECRET` 以 `NEXT_PUBLIC_` 前缀命名，会打包到客户端 JS。JS API 安全密钥应通过服务端注入或删除此前缀。
-3. **`(session.user as any).id` 类型断言** — 多处使用 `as any` 访问 `session.user.id`。应扩展 next-auth 的 Session 类型声明。
-4. **MapContainer 中未使用的函数** — `getTrafficLabel`, `parseTransitSegments`, `drawRouteOnMap`, `safeBtoa`, `routeLinesRef` 定义但未被调用/引用（dead code）。
-5. **`/api/route/*` 未被使用** — 前端直接请求高德 API，这些代理路由存在但无调用方。可作为迁移目标。
-6. **SQLite 并发限制** — SQLite 在 Vercel/多实例部署时不可用，迁移到 PostgreSQL 需要改 Prisma provider。
-7. **无环境变量校验** — `process.env.*!` 使用非空断言，运行时如果缺少环境变量会直接抛出错误，缺少友好的 fallback。
+1. **NEXT_PUBLIC_AMAP_SECRET 前端暴露** — `.env.local` 中 `NEXT_PUBLIC_AMAP_SECRET` 以 `NEXT_PUBLIC_` 前缀命名，会打包到客户端 JS。但 AMap JS API 2.0 的 `_AMapSecurityConfig.securityJsCode` 必须在浏览器端设置，这是高德官方要求的用法。通过域名白名单限制 Key 使用范围。
+2. **SQLite 并发限制** — SQLite 在 Vercel/多实例部署时不可用，迁移到 PostgreSQL 需要改 Prisma provider。
+3. **路线在地图上不可见** — 当前路线结果仅以文字展示在 CommutePanel 中，地图上不绘制路线 polyline。路线可视化留待 P1。
+
+# P0 修复记录 (2026-05-16)
+
+以下问题已在 P0 安全加固中修复：
+
+| # | 问题 | 状态 |
+|---|---|---|
+| P0-1 | TypeScript build 失败 + Session 类型不兼容 | fixed |
+| P0-2 | AMAP_WEB_KEY 硬编码前端 + 直连高德 REST API | fixed — 已迁移至 /api/route/* 代理 |
+| P0-3 | process.env.*! 分散无校验 | fixed — 新增 src/lib/env.ts 集中管理 |
+| P0-4 | fetch .catch(() => {}) 静默吞错 + 无限 loading | fixed — 新增 commuteError / mapError / noResults 等错误状态 |
+| P0-5 | POI 搜索用 bounds 粗筛可能包含 >3000m 的点 | fixed — 精确距离二次过滤 |
+| P0-6 | MapContainer 未使用 type import | fixed — 清理 dead code |
 
 # 数据流
 
@@ -138,8 +149,8 @@ src/
   → AddressInput (AMap.AutoComplete 搜索)
   → Home state: setAddressB({ lat, lng, name })
   → MapContainer: 绘制 B 标记 + fitView
-  → MapContainer: 4 路并发 fetch 高德 REST API (driving/transit/walking/riding)
-  → Home state: handleCommuteResult 增量合并
+  → MapContainer: 4 路并发 fetch /api/route/* 代理 (driving/transit/walking/riding)
+  → 4 路全部失败时触发 onCommuteError，停止 loading 并显示错误
   → Sidebar/MobileDrawer: CommutePanel 展示
 
 用户登录
@@ -161,10 +172,10 @@ src/
 
 - 高德地图 JS API 2.0 必须通过 `@amap/amap-jsapi-loader` 异步加载，不可用 `<script>` 标签。
 - `_AMapSecurityConfig` 必须在加载 AMap 之前设置到 `window` 上 — `src/lib/amap.ts:10-12` 已处理。
-- 此项目 **不是** git 仓库（初始状态为无版本控制），需要 `git init` + 初始 commit。
-- 项目处于 MVP 完成状态（5 阶段全部完成），可运行但未部署到生产环境。
+- 项目已用 Git 管理，当前分支 `main`，tag `v1.0.0`。
+- 项目处于 MVP 完成状态（5 阶段全部完成 + P0 安全加固），可运行但未部署到生产环境。
 - 开发服务器命令：`npm run dev` → http://localhost:3000。
-- Node.js 环境路径：`E:\Develop_Apps\NodeJS\node.exe`。
-- 所有地图交互逻辑集中在 `MapContainer.tsx`，这是一个 400+ 行的 `"use client"` 大组件，修改时要特别注意副作用和 ref 管理。
+- 所有地图交互逻辑集中在 `MapContainer.tsx`，修改时要特别注意副作用和 ref 管理。
 - 桌面/移动端共享相同的 props 接口 — 修改 Sidebar props 时需同步 MobileDrawer。
+- 环境变量通过 `src/lib/env.ts` 集中管理，禁止在业务代码中直接使用 `process.env.*!`。
 - Prisma migrations 需要手动运行：`npx prisma migrate dev`。
