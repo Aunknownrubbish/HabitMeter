@@ -26,7 +26,7 @@
 
 ---
 
-## P0-3: 环境变量集中校验 (commit ?)
+## P0-3: 环境变量集中校验 (commit e607265)
 
 **问题**：`process.env.NEXT_PUBLIC_AMAP_KEY!` 等分散在 5 个文件中，缺少统一校验入口。
 
@@ -41,7 +41,7 @@
 
 ## Commit 历史
 ```
-??? fix: P0-3 — centralized env validation with env.ts helpers
+e607265 fix: P0-3 — centralized env validation with env.ts helpers
 322bdf3 docs: P0-1 and P0-2 summary document
 3c1a73e fix: P0-1 followup — page.tsx handleCommuteResult type to Partial<CommuteResult>
 2eab9b3 fix: P0-2 — proxy commute route requests through /api/route/*
