@@ -84,7 +84,7 @@ export function CandidateComparisonPanel({
           候选对比
         </h2>
         <p className="text-sm text-slate-400">
-          加入候选后，可在此进行横向对比。
+          加入 2 个以上候选后，可在此比较综合分、维度优胜和偏好排序。
         </p>
       </Card>
     );
@@ -133,7 +133,7 @@ export function CandidateComparisonPanel({
       </div>
 
       <p className="mb-2 text-[10px] text-slate-400">
-        当前排序按：{modeLabel}
+        当前排序按：{modeLabel}。原综合分保留，偏好分只影响对比排名。
       </p>
 
       {/* Copy report */}

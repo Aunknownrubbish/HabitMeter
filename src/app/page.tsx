@@ -86,6 +86,12 @@ export default function Home() {
         lng: candidate.addressB.lng,
         name: candidate.addressB.name,
       });
+      setCommuteLoading(true);
+      setCommuteResult({ transit: null, driving: null, walking: null, riding: null });
+    } else {
+      setAddressB(null);
+      setCommuteLoading(false);
+      setCommuteResult({ transit: null, driving: null, walking: null, riding: null });
     }
     setCommuteError("");
   }, []);

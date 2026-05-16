@@ -27,8 +27,6 @@ const RATING_STYLE: Record<POIAccessibilitySummary["rating"], { text: string; cl
   none: { text: "暂无", className: "bg-slate-100 text-slate-400" },
 };
 
-const SKELETON_WIDTHS = ["86%", "68%", "92%", "74%", "58%"];
-
 export function POISummaryPanel({ poiResults, poiCount }: POISummaryPanelProps) {
   const summaries = useMemo(() => summarizePOIAccessibility(poiResults), [poiResults]);
 
@@ -36,40 +34,44 @@ export function POISummaryPanel({ poiResults, poiCount }: POISummaryPanelProps) 
     <Card>
       <h2 className="mb-3 text-sm font-semibold text-slate-800">周边配套</h2>
 
-      {poiCount > 0 ? (
-        <div>
-          {/* Summary grid */}
-          <div className="mb-3 grid grid-cols-3 gap-2">
-            {summaries.map((s) => {
-              const distText =
-                s.nearestDistance !== null
-                  ? `最近 ${formatDistance(s.nearestDistance)}`
-                  : "暂无";
-              const ratingStyle = RATING_STYLE[s.rating];
+      <div>
+        {/* Summary grid */}
+        <div className="mb-3 grid grid-cols-3 gap-2">
+          {summaries.map((s) => {
+            const distText =
+              s.nearestDistance !== null
+                ? `最近 ${formatDistance(s.nearestDistance)}`
+                : "暂无";
+            const ratingStyle = RATING_STYLE[s.rating];
 
-              return (
-                <div
-                  key={s.category}
-                  className="rounded-lg border border-slate-100 bg-slate-50 p-2 text-center"
-                >
-                  <div className="text-lg font-bold text-slate-800">
-                    {s.count > 0 ? s.count : "—"}
-                  </div>
-                  <div className="text-xs text-slate-500">{s.label}</div>
-                  <div className="mt-0.5 text-[10px] text-slate-400 leading-tight">
-                    {distText}
-                  </div>
-                  <span
-                    className={`mt-1 inline-block rounded px-1.5 py-0.5 text-[10px] font-medium ${ratingStyle.className}`}
-                  >
-                    {ratingStyle.text}
-                  </span>
+            return (
+              <div
+                key={s.category}
+                className="rounded-lg border border-slate-100 bg-slate-50 p-2 text-center"
+              >
+                <div className="text-lg font-bold text-slate-800">
+                  {s.count > 0 ? s.count : "—"}
                 </div>
-              );
-            })}
-          </div>
+                <div className="text-xs text-slate-500">{s.label}</div>
+                <div className="mt-0.5 text-[10px] text-slate-400 leading-tight">
+                  {distText}
+                </div>
+                <span
+                  className={`mt-1 inline-block rounded px-1.5 py-0.5 text-[10px] font-medium ${ratingStyle.className}`}
+                >
+                  {ratingStyle.text}
+                </span>
+              </div>
+            );
+          })}
+        </div>
 
-          {/* Expandable POI detail lists */}
+        {poiCount === 0 ? (
+          <p className="text-sm text-slate-400">
+            3km 内暂未找到已开启类别的周边设施，可调整筛选类别或换一个候选地址。
+          </p>
+        ) : (
+          /* Expandable POI detail lists */
           <div className="space-y-2">
             {POI_CATEGORIES.map((cat) => {
               const items = poiResults[cat.key] ?? [];
@@ -108,25 +110,9 @@ export function POISummaryPanel({ poiResults, poiCount }: POISummaryPanelProps) 
               );
             })}
           </div>
-        </div>
-      ) : (
-        <SkeletonLines count={5} />
-      )}
+        )}
+      </div>
     </Card>
-  );
-}
-
-function SkeletonLines({ count }: { count: number }) {
-  return (
-    <div className="space-y-2">
-      {Array.from({ length: count }).map((_, i) => (
-        <div
-          key={i}
-          className="h-5 animate-pulse rounded bg-slate-100"
-          style={{ width: SKELETON_WIDTHS[i % SKELETON_WIDTHS.length] }}
-        />
-      ))}
-    </div>
   );
 }
 

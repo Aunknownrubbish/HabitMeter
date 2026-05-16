@@ -74,7 +74,7 @@ Recommended screenshot set:
 - `v1.0.1`: P0 stability and security pass, including type fixes, server-side AMap route proxy, env validation, and error states.
 - `v1.1.0`: P1 product upgrade with living score, conclusion card, POI accessibility summary, commute recommendation, and clearer information architecture.
 - `v1.2.0`: P2 comparison upgrade with local candidate list, multi-candidate comparison, preference modes, and copyable report.
-- Showcase phase: public repository preparation, product case study, demo script, and deployment readiness.
+- `v1.3.0`: Showcase release with public repository preparation, product case study, demo script, deployment guide, demo polish, and final showcase summary.
 
 ## Local Development
 
@@ -154,5 +154,4 @@ Do not commit real `.env` files, local SQLite databases, `.next`, `node_modules`
 
 ## Roadmap
 
-- Showcase-4: demo polish and final showcase verification.
 - P3: account-level candidate sync, production database migration, and route visualization.

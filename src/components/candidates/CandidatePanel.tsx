@@ -124,7 +124,7 @@ export function CandidatePanel({
       </h2>
 
       <p className="mb-2 text-[11px] text-slate-400">
-        候选清单保存在当前浏览器。
+        候选清单保存在当前浏览器，添加或删除后会立即刷新。
       </p>
 
       {addedMsg && (
@@ -198,7 +198,9 @@ export function CandidatePanel({
 
       {/* Candidate list */}
       {candidates.length === 0 ? (
-        <p className="text-sm text-slate-400">暂无候选</p>
+        <p className="text-sm text-slate-400">
+          暂无候选。添加 2 个以上候选后，可在下方横向对比。
+        </p>
       ) : (
         <ul className="space-y-2">
           {candidates
