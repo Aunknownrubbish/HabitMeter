@@ -36,6 +36,12 @@ Netlify 理论上也可以部署 Next.js，但当前阶段优先选择 Vercel，
 
 当前项目适合部署为 **展示版 Demo**。
 
+当前公开 Demo：
+
+```text
+https://habit-meter-nu.vercel.app
+```
+
 适合线上展示的能力：
 
 - 地址搜索。
@@ -210,3 +216,13 @@ npx prisma migrate deploy
 8. 复制对比报告。
 
 这样即使登录收藏因为数据库方案暂未生产化，也不会影响产品核心展示。
+
+## 12. 部署记录
+
+### v1.3.1
+
+- 平台：Vercel
+- 仓库：GitHub `Aunknownrubbish/HabitMeter`
+- 分支：`main`
+- 线上地址：<https://habit-meter-nu.vercel.app>
+- 状态：已完成首次公开 Demo 部署。

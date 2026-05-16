@@ -2,6 +2,8 @@
 
 HabitMeter is a living-location decision tool for comparing rental or residential candidates. It turns an address into a practical judgment: commute pressure, nearby facilities, accessibility, strengths, weaknesses, and multi-candidate comparison.
 
+**Live Demo:** <https://habit-meter-nu.vercel.app>
+
 ## Product Positioning
 
 Most rental decisions are made with scattered information: map searches, commute checks, notes, screenshots, and personal memory. HabitMeter brings those signals into one workflow so a user can answer a simpler question:
@@ -75,6 +77,7 @@ Recommended screenshot set:
 - `v1.1.0`: P1 product upgrade with living score, conclusion card, POI accessibility summary, commute recommendation, and clearer information architecture.
 - `v1.2.0`: P2 comparison upgrade with local candidate list, multi-candidate comparison, preference modes, and copyable report.
 - `v1.3.0`: Showcase release with public repository preparation, product case study, demo script, deployment guide, demo polish, and final showcase summary.
+- `v1.3.1`: Public Vercel demo link added to project documentation.
 
 ## Local Development
 
@@ -122,6 +125,12 @@ npm run build
 ## Deployment
 
 The recommended deployment target is Vercel because this is a Next.js App Router project with API Routes.
+
+Current public demo:
+
+```text
+https://habit-meter-nu.vercel.app
+```
 
 See [docs/deployment-guide.md](docs/deployment-guide.md) for the full deployment checklist, environment variable setup, and current SQLite limitations.
 
