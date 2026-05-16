@@ -6,7 +6,8 @@
         "lint": "next lint",
         "build": "next build",
         "dev": "next dev",
-        "start": "next start"
+        "start": "next start",
+        "postinstall": "prisma generate"
     },
     "dependencies": {
         "@amap/amap-jsapi-loader": "^1.0.1",

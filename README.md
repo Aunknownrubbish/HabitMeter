@@ -31,6 +31,7 @@ The product currently focuses on three jobs:
 - [Product case study](docs/product-case-study.md): problem framing, user scenario, product decisions, and roadmap.
 - [Demo script](docs/demo-script.md): 3-minute and 5-minute walkthroughs for presenting the product.
 - [Version story](docs/version-story.md): how the project evolved from MVP to P0/P1/P2 and Showcase.
+- [Deployment guide](docs/deployment-guide.md): Vercel deployment steps, environment variables, and SQLite limitations.
 - [P1 product summary](docs/P1-product-enhancement-summary.md): living score, conclusion card, POI summary, and commute recommendation.
 - [P2 comparison summary](docs/P2-candidate-comparison-summary.md): candidate list, comparison, preference modes, and report copy.
 
@@ -118,6 +119,12 @@ Build for production:
 npm run build
 ```
 
+## Deployment
+
+The recommended deployment target is Vercel because this is a Next.js App Router project with API Routes.
+
+See [docs/deployment-guide.md](docs/deployment-guide.md) for the full deployment checklist, environment variable setup, and current SQLite limitations.
+
 ## Environment Variables
 
 | Variable | Used by | Notes |
@@ -147,6 +154,5 @@ Do not commit real `.env` files, local SQLite databases, `.next`, `node_modules`
 
 ## Roadmap
 
-- Showcase-3: deployment guide and Vercel readiness.
 - Showcase-4: demo polish and final showcase verification.
 - P3: account-level candidate sync, production database migration, and route visualization.
