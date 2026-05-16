@@ -97,13 +97,7 @@ export function Sidebar({ className = "", ...props }: SidebarProps) {
           score={livingScore}
           addressAName={addressA?.name}
           addressBName={addressB?.name}
-          loading={commuteLoading}
         />
-
-        {/* Stats Panel */}
-        {addressA && (
-          <POISummaryPanel poiResults={poiResults} poiCount={poiCount} />
-        )}
 
         {/* Commute Panel */}
         <CommutePanel
@@ -116,6 +110,11 @@ export function Sidebar({ className = "", ...props }: SidebarProps) {
           addressAName={addressA?.name}
           addressBName={addressB?.name}
         />
+
+        {/* Stats Panel */}
+        {addressA && (
+          <POISummaryPanel poiResults={poiResults} poiCount={poiCount} />
+        )}
 
         {/* Auth */}
         <AuthPanel session={session} />

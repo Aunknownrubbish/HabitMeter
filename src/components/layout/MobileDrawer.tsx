@@ -107,8 +107,8 @@ export function MobileDrawer({ open, onClose, ...props }: MobileDrawerProps) {
   const tabs = [
     { key: "search", icon: Search, label: "搜索" },
     { key: "conclusion", icon: ClipboardList, label: "结论" },
-    { key: "stats", icon: BarChart3, label: "配套", badge: addressA ? poiCount : null },
     { key: "commute", icon: Bus, label: "通勤" },
+    { key: "stats", icon: BarChart3, label: "配套", badge: addressA ? poiCount : null },
     { key: "saved", icon: Bookmark, label: session ? "收藏" : "登录" },
   ] as const;
 
@@ -217,6 +217,22 @@ export function MobileDrawer({ open, onClose, ...props }: MobileDrawerProps) {
             </div>
           )}
 
+          {/* Commute Tab */}
+          {activeTab === "commute" && (
+            <div className="space-y-4 pt-3">
+              <CommutePanel
+                transit={commuteResult.transit}
+                driving={commuteResult.driving}
+                walking={commuteResult.walking}
+                riding={commuteResult.riding}
+                loading={commuteLoading}
+                error={commuteError}
+                addressAName={addressA?.name}
+                addressBName={addressB?.name}
+              />
+            </div>
+          )}
+
           {/* Stats Tab */}
           {activeTab === "stats" && (
             <div className="space-y-4 pt-3">
@@ -232,22 +248,6 @@ export function MobileDrawer({ open, onClose, ...props }: MobileDrawerProps) {
                   </p>
                 </Card>
               )}
-            </div>
-          )}
-
-          {/* Commute Tab */}
-          {activeTab === "commute" && (
-            <div className="space-y-4 pt-3">
-              <CommutePanel
-                transit={commuteResult.transit}
-                driving={commuteResult.driving}
-                walking={commuteResult.walking}
-                riding={commuteResult.riding}
-                loading={commuteLoading}
-                error={commuteError}
-                addressAName={addressA?.name}
-                addressBName={addressB?.name}
-              />
             </div>
           )}
 

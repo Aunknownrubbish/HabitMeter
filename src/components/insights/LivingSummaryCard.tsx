@@ -53,8 +53,8 @@ export function LivingSummaryCard({
     return (
       <Card>
         <h2 className="mb-2 text-sm font-semibold text-slate-800">居住结论</h2>
-        <p className="text-sm text-slate-400">
-          输入意向居住地后生成居住分析
+        <p className="text-sm text-slate-400 leading-relaxed">
+          输入一个候选居住地，查看 3km 生活圈和通勤压力。
         </p>
       </Card>
     );

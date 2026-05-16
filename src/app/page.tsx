@@ -117,6 +117,15 @@ export default function Home() {
           {addressA && (
             <p className="truncate text-[11px] text-slate-400">
               {addressA.name}
+              {livingScore.dataQuality.hasAddressA && (
+                <span className="text-[var(--color-primary)] font-medium">
+                  {" "}
+                  {livingScore.level === "excellent" || livingScore.level === "good"
+                    ? "推荐"
+                    : ""}{" "}
+                  {livingScore.total}分
+                </span>
+              )}
               {poiCount > 0 && ` · ${poiCount}个周边设施`}
             </p>
           )}
