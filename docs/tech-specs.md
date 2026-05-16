@@ -50,10 +50,14 @@ src/
 │   │   ├── AddressInput.tsx    # 地址输入框
 │   │   └── POIToggles.tsx     # POI 勾选开关
 │   ├── commute/
-│   │   └── CommutePanel.tsx    # 通勤结果展示
+│   │   └── CommutePanel.tsx    # 通勤结果展示（含推荐横幅）
+│   ├── insights/
+│   │   └── LivingSummaryCard.tsx  # 居住结论摘要卡
+│   ├── poi/
+│   │   └── POISummaryPanel.tsx # POI 可达性面板
 │   ├── auth/
 │   │   ├── AuthPanel.tsx       # 登录/注册表单
-│   │   └── SavedLocations.tsx  # 收藏地址列表
+│   │   └── SavedLocations.tsx  # 收藏地址列表（含评分快照）
 │   └── ui/
 │       ├── Card.tsx
 │       ├── Input.tsx
@@ -63,7 +67,10 @@ src/
 │   ├── amap.ts                 # 高德地图加载
 │   ├── auth.ts                 # NextAuth 配置
 │   ├── db.ts                   # Prisma 客户端
-│   └── env.ts                  # 环境变量集中校验
+│   ├── env.ts                  # 环境变量集中校验
+│   ├── living-score.ts         # 居住评分 v1
+│   ├── poi-analysis.ts         # POI 可达性分析
+│   └── commute-recommendation.ts  # 通勤推荐
 └── types/
     ├── index.ts                # POI/Commute 类型
     └── next-auth.d.ts          # NextAuth 模块增强
