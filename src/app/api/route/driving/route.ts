@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getAmapWebKey } from "@/lib/env";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -9,7 +10,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "缺少参数" }, { status: 400 });
   }
 
-  const key = process.env.AMAP_WEB_KEY;
+  const key = getAmapWebKey();
   if (!key) {
     return NextResponse.json({ error: "AMAP_WEB_KEY not configured" }, { status: 500 });
   }

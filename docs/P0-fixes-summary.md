@@ -26,14 +26,23 @@
 
 ---
 
-## P0-3: 环境变量集中校验（当前）
+## P0-3: 环境变量集中校验 (commit ?)
 
-见下方日志。
+**问题**：`process.env.NEXT_PUBLIC_AMAP_KEY!` 等分散在 5 个文件中，缺少统一校验入口。
+
+**修改**：
+- 新建 `src/lib/env.ts` — `getServerEnv()` / `getAmapWebKey()` / `getClientAmapConfig()`
+- `src/lib/amap.ts` 改用 `getClientAmapConfig()`，缺失时 throw 明确错误
+- 4 个 `/api/route/*` 改用 `getAmapWebKey()`
+
+**结果**：5 个环境变量全部集中校验，0 处 `process.env.*!` 非空断言。客户端报错可被捕获，服务端返回清晰错误。
 
 ---
 
 ## Commit 历史
 ```
+??? fix: P0-3 — centralized env validation with env.ts helpers
+322bdf3 docs: P0-1 and P0-2 summary document
 3c1a73e fix: P0-1 followup — page.tsx handleCommuteResult type to Partial<CommuteResult>
 2eab9b3 fix: P0-2 — proxy commute route requests through /api/route/*
 2b1de1e fix: P0-1 — NextAuth session type unification + build errors
