@@ -58,6 +58,9 @@ src/
 │   ├── auth/
 │   │   ├── AuthPanel.tsx       # 登录/注册表单
 │   │   └── SavedLocations.tsx  # 收藏地址列表（含评分快照）
+│   ├── candidates/
+│   │   ├── CandidatePanel.tsx  # 候选清单面板
+│   │   └── CandidateComparisonPanel.tsx  # 候选对比面板
 │   └── ui/
 │       ├── Card.tsx
 │       ├── Input.tsx
@@ -70,7 +73,11 @@ src/
 │   ├── env.ts                  # 环境变量集中校验
 │   ├── living-score.ts         # 居住评分 v1
 │   ├── poi-analysis.ts         # POI 可达性分析
-│   └── commute-recommendation.ts  # 通勤推荐
+│   ├── commute-recommendation.ts  # 通勤推荐
+│   ├── candidates.ts           # 候选数据模型 + localStorage CRUD
+│   ├── candidate-comparison.ts # 候选对比计算引擎
+│   ├── preference-weights.ts   # 偏好权重与场景模式
+│   └── comparison-report.ts    # 纯文本对比报告
 └── types/
     ├── index.ts                # POI/Commute 类型
     └── next-auth.d.ts          # NextAuth 模块增强

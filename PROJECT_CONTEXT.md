@@ -116,12 +116,18 @@ src/
 - [x] 移动端可拖拽底部抽屉（peek/half/full 三档吸附）
 - [x] 移动端 Tab 导航（搜索/结论/通勤/配套/收藏 5 个标签）
 - [x] 骨架屏加载态 + 地图/路线/收藏错误状态全覆盖
+- [x] 候选清单（加入候选/状态管理/localStorage 持久化）
+- [x] 多候选横向对比（综合/通勤/交通/生活/医疗/休闲 6 维表格 + 维度优胜）
+- [x] 偏好模式排序（均衡/通勤优先/生活便利优先/交通优先/医疗优先）
+- [x] 复制对比报告（纯文本报告一键复制）
+- [x] 移动端 Tab（搜索/结论/通勤/配套/保存，候选与对比在保存 tab 内）
 
 # 已知问题
 
 1. **NEXT_PUBLIC_AMAP_SECRET 前端暴露** — `.env.local` 中 `NEXT_PUBLIC_AMAP_SECRET` 以 `NEXT_PUBLIC_` 前缀命名，会打包到客户端 JS。但 AMap JS API 2.0 的 `_AMapSecurityConfig.securityJsCode` 必须在浏览器端设置，这是高德官方要求的用法。通过域名白名单限制 Key 使用范围。
 2. **SQLite 并发限制** — SQLite 在 Vercel/多实例部署时不可用，迁移到 PostgreSQL 需要改 Prisma provider。
-3. **路线在地图上不可见** — 当前路线结果仅以文字展示在 CommutePanel 中，地图上不绘制路线 polyline。路线可视化留待 P2。
+3. **路线在地图上不可见** — 当前路线结果仅以文字展示在 CommutePanel 中，地图上不绘制路线 polyline。路线可视化留待 P3。
+4. **候选清单仅本地存储** — 候选数据保存在浏览器 localStorage，换设备或清除缓存后会丢失。服务端同步留待 P3。
 
 # P0 修复记录 (2026-05-16)
 
@@ -148,6 +154,19 @@ src/
 | P1-6 | 收藏增强 | 评分快照预览 + 删除确认 + 名称引导 |
 
 所有 P1 功能均已通过 `npm run build` 验证。
+
+# P2 多候选对比 (2026-05-16)
+
+| # | 功能 | 说明 |
+|---|---|---|
+| P2-1 | 候选数据模型 | `src/lib/candidates.ts` — CandidateLocation + localStorage CRUD |
+| P2-2 | 候选清单 UI | `CandidatePanel` — 加入/状态管理/回填 |
+| P2-3 | 对比计算引擎 | `src/lib/candidate-comparison.ts` — 排名 + 维度冠军 + summary/warnings |
+| P2-4 | 对比 UI | `CandidateComparisonPanel` — 表格/卡片 + 维度优胜 |
+| P2-5 | 偏好权重 | `src/lib/preference-weights.ts` — 5 种场景模式 + 加权排序 |
+| P2-6 | 复制报告 | `src/lib/comparison-report.ts` — 纯文本报告一键复制 |
+
+> 注意：候选清单目前保存在当前浏览器（localStorage），尚未同步到账户。换设备或清除缓存后会丢失。
 
 # 数据流
 
@@ -187,8 +206,8 @@ src/
 
 - 高德地图 JS API 2.0 必须通过 `@amap/amap-jsapi-loader` 异步加载，不可用 `<script>` 标签。
 - `_AMapSecurityConfig` 必须在加载 AMap 之前设置到 `window` 上 — `src/lib/amap.ts:10-12` 已处理。
-- 项目已用 Git 管理，当前分支 `main`，最新 tag `v1.1.0`。
-- 项目处于 P1 居住决策增强完成状态（5 阶段 + P0 + P1-1~P1-6），可运行但未部署到生产环境。
+- 项目已用 Git 管理，当前分支 `main`，最新 tag `v1.2.0`。
+- 项目处于 P2 多候选对比完成状态（5 阶段 + P0 + P1 + P2-1~P2-6），可运行但未部署到生产环境。
 - 开发服务器命令：`npm run dev` → http://localhost:3000。
 - 所有地图交互逻辑集中在 `MapContainer.tsx`，修改时要特别注意副作用和 ref 管理。
 - 桌面/移动端共享相同的 props 接口 — 修改 Sidebar props 时需同步 MobileDrawer。
