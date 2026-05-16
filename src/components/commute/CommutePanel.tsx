@@ -1,6 +1,8 @@
+import { useMemo } from "react";
 import { Card } from "@/components/ui/Card";
 import type { TransitInfo, DrivingInfo, WalkingInfo, RidingInfo } from "@/types";
-import { Bus, Car, Footprints, Bike, Clock, MapPin, ArrowRight } from "lucide-react";
+import { getCommuteRecommendation } from "@/lib/commute-recommendation";
+import { Bus, Car, Footprints, Bike, Clock, MapPin, ArrowRight, Star, AlertTriangle } from "lucide-react";
 
 interface CommutePanelProps {
   transit: TransitInfo | null;
@@ -13,6 +15,20 @@ interface CommutePanelProps {
   addressBName?: string;
 }
 
+const MODE_ICONS: Record<string, React.ElementType> = {
+  transit: Bus,
+  driving: Car,
+  riding: Bike,
+  walking: Footprints,
+};
+
+const MODE_LABELS: Record<string, string> = {
+  transit: "公共交通",
+  driving: "驾车",
+  riding: "骑行",
+  walking: "步行",
+};
+
 export function CommutePanel({
   transit,
   driving,
@@ -24,6 +40,19 @@ export function CommutePanel({
   addressBName,
 }: CommutePanelProps) {
   const hasAnyResult = transit || driving || walking || riding;
+
+  const recommendation = useMemo(
+    () =>
+      getCommuteRecommendation({
+        transit,
+        driving,
+        walking,
+        riding,
+      }),
+    [transit, driving, walking, riding]
+  );
+
+  const isRecommended = (mode: string) => recommendation.mode === mode;
 
   return (
     <Card>
@@ -52,13 +81,40 @@ export function CommutePanel({
             <span className="truncate">{addressBName}</span>
           </div>
 
+          {/* Recommendation Banner */}
+          {recommendation.mode && (
+            <div className="rounded-lg border border-[var(--color-primary-light)] bg-blue-50/60 p-3">
+              <div className="flex items-center gap-1.5 text-sm font-semibold text-[var(--color-primary)]">
+                <Star className="h-4 w-4" />
+                {recommendation.title}
+              </div>
+              <p className="mt-1 text-xs text-slate-600">{recommendation.reason}</p>
+              {recommendation.warnings.length > 0 && (
+                <div className="mt-1.5 space-y-0.5">
+                  {recommendation.warnings.map((w, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-1 text-xs text-amber-600"
+                    >
+                      <AlertTriangle className="h-3 w-3 shrink-0" />
+                      {w}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Driving */}
           {driving && (
-            <details className="group">
+            <details className="group" open={isRecommended("driving")}>
               <summary className="flex cursor-pointer items-center gap-2 rounded-lg bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
                 <Car className="h-4 w-4 text-blue-600" />
                 驾车
                 <span className="ml-auto text-xs text-slate-400">{driving.summary}</span>
+                {isRecommended("driving") && (
+                  <Star className="h-3 w-3 text-[var(--color-primary)]" />
+                )}
               </summary>
               <div className="mt-1.5 px-3">
                 <div className="flex gap-3 text-xs text-slate-500">
@@ -80,11 +136,14 @@ export function CommutePanel({
 
           {/* Transit */}
           {transit && transit.segments.length > 0 && (
-            <details className="group" open>
+            <details className="group" open={isRecommended("transit")}>
               <summary className="flex cursor-pointer items-center gap-2 rounded-lg bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
                 <Bus className="h-4 w-4 text-green-600" />
                 公共交通
                 <span className="ml-auto text-xs text-slate-400">{transit.summary}</span>
+                {isRecommended("transit") && (
+                  <Star className="h-3 w-3 text-[var(--color-primary)]" />
+                )}
               </summary>
               <div className="mt-1.5 space-y-0">
                 {/* Segments timeline */}
@@ -151,11 +210,14 @@ export function CommutePanel({
 
           {/* Riding */}
           {riding && (
-            <details className="group">
+            <details className="group" open={isRecommended("riding")}>
               <summary className="flex cursor-pointer items-center gap-2 rounded-lg bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
                 <Bike className="h-4 w-4 text-orange-500" />
                 骑行
                 <span className="ml-auto text-xs text-slate-400">{riding.summary}</span>
+                {isRecommended("riding") && (
+                  <Star className="h-3 w-3 text-[var(--color-primary)]" />
+                )}
               </summary>
               <div className="mt-1.5 px-3">
                 <div className="flex gap-3 text-xs text-slate-500">
@@ -171,11 +233,14 @@ export function CommutePanel({
 
           {/* Walking */}
           {walking && (
-            <details className="group">
+            <details className="group" open={isRecommended("walking")}>
               <summary className="flex cursor-pointer items-center gap-2 rounded-lg bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
                 <Footprints className="h-4 w-4 text-slate-500" />
                 步行
                 <span className="ml-auto text-xs text-slate-400">{walking.summary}</span>
+                {isRecommended("walking") && (
+                  <Star className="h-3 w-3 text-[var(--color-primary)]" />
+                )}
               </summary>
               <div className="mt-1.5 px-3">
                 <div className="flex gap-3 text-xs text-slate-500">
