@@ -1,7 +1,21 @@
 node_modules/
 .next/
+
+# Environment variables
 .env
-.env.local
-.env.production
+.env.*
+!.env.example
+
+# Local database files
 *.db
 *.db-journal
+prisma/*.db
+prisma/*.db-journal
+
+# Local IDE / agent settings
+.claude/
+.vscode/
+.idea/
+
+# Local generated drafts
+HabitMeter_Product_Optimization_Report.docx
