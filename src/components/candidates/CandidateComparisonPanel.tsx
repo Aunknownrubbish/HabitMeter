@@ -1,13 +1,19 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { Card } from "@/components/ui/Card";
 import { loadCandidates } from "@/lib/candidates";
 import {
   compareCandidates,
   type ComparisonDimension,
 } from "@/lib/candidate-comparison";
-import { Layers, Trophy, AlertTriangle, ChevronRight } from "lucide-react";
+import {
+  PREFERENCE_PRESETS,
+  loadPreferenceMode,
+  savePreferenceMode,
+  type PreferenceMode,
+} from "@/lib/preference-weights";
+import { Trophy, AlertTriangle, ChevronRight, SlidersHorizontal } from "lucide-react";
 
 interface CandidateComparisonPanelProps {
   refreshKey?: number;
@@ -32,8 +38,23 @@ const STATUS_LABELS: Record<string, string> = {
 export function CandidateComparisonPanel({
   refreshKey,
 }: CandidateComparisonPanelProps) {
+  const [preferenceMode, setPreferenceMode] = useState<PreferenceMode>(
+    () => loadPreferenceMode()
+  );
+
+  const handleModeChange = useCallback((mode: PreferenceMode) => {
+    setPreferenceMode(mode);
+    savePreferenceMode(mode);
+  }, []);
+
   const candidates = useMemo(() => loadCandidates(), [refreshKey]);
-  const result = useMemo(() => compareCandidates(candidates), [candidates]);
+  const result = useMemo(
+    () => compareCandidates(candidates, preferenceMode),
+    [candidates, preferenceMode]
+  );
+
+  const modeLabel = PREFERENCE_PRESETS[preferenceMode]?.label ?? "均衡";
+  const isCustomMode = preferenceMode !== "balanced";
 
   // 0 candidates
   if (candidates.length === 0) {
@@ -68,10 +89,33 @@ export function CandidateComparisonPanel({
   // 2+ candidates
   return (
     <Card>
-      <h2 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-slate-800">
+      <h2 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-slate-800">
         <Trophy className="h-4 w-4 text-[var(--color-primary)]" />
         候选对比
       </h2>
+
+      {/* Preference mode selector */}
+      <div className="mb-2 flex flex-wrap gap-1">
+        {(
+          Object.entries(PREFERENCE_PRESETS) as [PreferenceMode, { label: string }][]
+        ).map(([key, preset]) => (
+          <button
+            key={key}
+            onClick={() => handleModeChange(key)}
+            className={`rounded-full px-2.5 py-0.5 text-[10px] font-medium transition-colors ${
+              preferenceMode === key
+                ? "bg-[var(--color-primary)] text-white"
+                : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+            }`}
+          >
+            {preset.label}
+          </button>
+        ))}
+      </div>
+
+      <p className="mb-2 text-[10px] text-slate-400">
+        当前排序按：{modeLabel}
+      </p>
 
       {/* Summary */}
       <p className="mb-2 text-xs text-slate-600">{result.summary}</p>
@@ -147,6 +191,9 @@ export function CandidateComparisonPanel({
                   {d.label}
                 </th>
               ))}
+{isCustomMode && (
+                <th className="py-1.5 px-1 text-center font-medium w-10">偏好分</th>
+              )}
               <th className="py-1.5 pl-2 text-left font-medium">推荐通勤</th>
             </tr>
           </thead>
@@ -181,6 +228,11 @@ export function CandidateComparisonPanel({
                     </td>
                   );
                 })}
+                {isCustomMode && (
+                  <td className="py-1.5 px-1 text-center font-semibold text-[var(--color-primary)] tabular-nums">
+                    {result.weightedScores[c.id] ?? 0}
+                  </td>
+                )}
                 <td className="py-1.5 pl-2 text-slate-500 truncate max-w-[120px]">
                   {c.commute.recommendedTitle}
                 </td>
@@ -235,7 +287,12 @@ export function CandidateComparisonPanel({
                 );
               })}
             </div>
-            <div className="mt-1.5 flex items-center gap-1 text-[10px] text-slate-400">
+            {isCustomMode && (
+              <div className="mt-1 text-[10px] text-slate-500">
+                偏好分：<span className="font-semibold text-[var(--color-primary)]">{result.weightedScores[c.id] ?? 0}</span>
+              </div>
+            )}
+            <div className="mt-1 flex items-center gap-1 text-[10px] text-slate-400">
               <ChevronRight className="h-3 w-3" />
               {c.commute.recommendedTitle}
             </div>

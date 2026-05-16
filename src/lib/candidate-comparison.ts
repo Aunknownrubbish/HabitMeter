@@ -1,4 +1,6 @@
 import type { CandidateLocation } from "@/lib/candidates";
+import type { PreferenceMode, PreferenceWeights } from "@/lib/preference-weights";
+import { PREFERENCE_PRESETS, calculateWeightedCandidateScore } from "@/lib/preference-weights";
 
 // ---- Types ----
 
@@ -25,6 +27,8 @@ export interface CandidateComparisonResult {
   winners: ComparisonWinner[];
   summary: string;
   warnings: string[];
+  preferenceMode: PreferenceMode;
+  weightedScores: Record<string, number>;
 }
 
 // ---- Dimension config ----
@@ -132,8 +136,23 @@ function buildWinner(
 // ---- Main ----
 
 export function compareCandidates(
-  candidates: CandidateLocation[]
+  candidates: CandidateLocation[],
+  preference?: PreferenceMode | { weights: PreferenceWeights }
 ): CandidateComparisonResult {
+  // Resolve preference
+  let mode: PreferenceMode = "balanced";
+  let weights: PreferenceWeights;
+  if (preference && typeof preference === "object" && "weights" in preference) {
+    weights = preference.weights;
+    mode = "balanced"; // custom weights treated as balanced-derived
+  } else if (typeof preference === "string") {
+    mode = preference;
+    weights = PREFERENCE_PRESETS[mode]?.weights ?? PREFERENCE_PRESETS.balanced.weights;
+  } else {
+    mode = "balanced";
+    weights = PREFERENCE_PRESETS.balanced.weights;
+  }
+
   if (candidates.length === 0) {
     return {
       candidates: [],
@@ -148,13 +167,23 @@ export function compareCandidates(
       })),
       summary: "暂无候选",
       warnings: [],
+      preferenceMode: mode,
+      weightedScores: {},
     };
   }
 
-  // Sort
-  const sortedByTotal = [...candidates].sort(
-    (a, b) => b.score.total - a.score.total
-  );
+  // Compute weighted scores
+  const weightedScores: Record<string, number> = {};
+  for (const c of candidates) {
+    weightedScores[c.id] = calculateWeightedCandidateScore(c, weights);
+  }
+
+  // Sort by weighted score, then by original total as tie-break
+  const sortedByTotal = [...candidates].sort((a, b) => {
+    const diff = weightedScores[b.id] - weightedScores[a.id];
+    if (diff !== 0) return diff;
+    return b.score.total - a.score.total;
+  });
   const bestOverall = sortedByTotal[0];
 
   // Winners per dimension
@@ -164,20 +193,29 @@ export function compareCandidates(
   });
 
   // Summary
+  const modeLabel = PREFERENCE_PRESETS[mode]?.label ?? "均衡";
   let summary: string;
   if (candidates.length === 1) {
     summary = `已加入 1 个候选，继续添加后可进行横向比较。`;
   } else if (candidates.length === 2) {
     const a = sortedByTotal[0];
     const b = sortedByTotal[1];
-    const gap = a.score.total - b.score.total;
-    summary = `${a.title}综合更优（${a.score.total}分 vs ${b.score.total}分）${
-      gap < 5 ? "，差距较小" : ""
-    }。`;
+    const gap = weightedScores[a.id] - weightedScores[b.id];
+    summary =
+      mode === "balanced"
+        ? `${a.title}综合更优（${a.score.total}分 vs ${b.score.total}分）${
+            gap < 5 ? "，差距较小" : ""
+          }。`
+        : `按${modeLabel}排序，${a.title}更优（偏好分 ${weightedScores[a.id]} vs ${weightedScores[b.id]}）${
+            gap < 5 ? "，差距较小" : ""
+          }。`;
   } else {
     const top = sortedByTotal.slice(0, 3);
     const names = top.map((c) => c.title).join("、");
-    summary = `综合来看，${names}排名靠前。${bestOverall.title}在当前候选中最均衡。`;
+    summary =
+      mode === "balanced"
+        ? `综合来看，${names}排名靠前。${bestOverall.title}在当前候选中最均衡。`
+        : `按${modeLabel}排序，${names}排名靠前。${bestOverall.title}在当前偏好下最优。`;
   }
 
   // Warnings
@@ -189,8 +227,8 @@ export function compareCandidates(
   }
 
   if (candidates.length >= 2) {
-    const gap =
-      sortedByTotal[0].score.total - sortedByTotal[1].score.total;
+    const top2 = sortedByTotal.slice(0, 2);
+    const gap = weightedScores[top2[0].id] - weightedScores[top2[1].id];
     if (gap < 5) {
       warnings.push("前两名差距较小，建议结合价格和实地体验判断");
     }
@@ -207,5 +245,7 @@ export function compareCandidates(
     winners,
     summary,
     warnings,
+    preferenceMode: mode,
+    weightedScores,
   };
 }
