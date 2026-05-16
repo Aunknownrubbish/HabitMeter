@@ -6,10 +6,6 @@ import type {
   POICategory,
   POIItem,
   CommuteResult,
-  TransitInfo,
-  DrivingInfo,
-  WalkingInfo,
-  RidingInfo,
   TransitSegment,
 } from "@/types";
 import { POI_CATEGORIES } from "@/types";
