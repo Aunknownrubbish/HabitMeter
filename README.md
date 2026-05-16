@@ -26,6 +26,36 @@ The product currently focuses on three jobs:
 - Multi-candidate comparison with overall winner, dimension winners, and preference-weighted ranking.
 - Copyable comparison report for sharing or decision notes.
 
+## Product Documentation
+
+- [Product case study](docs/product-case-study.md): problem framing, user scenario, product decisions, and roadmap.
+- [Demo script](docs/demo-script.md): 3-minute and 5-minute walkthroughs for presenting the product.
+- [Version story](docs/version-story.md): how the project evolved from MVP to P0/P1/P2 and Showcase.
+- [P1 product summary](docs/P1-product-enhancement-summary.md): living score, conclusion card, POI summary, and commute recommendation.
+- [P2 comparison summary](docs/P2-candidate-comparison-summary.md): candidate list, comparison, preference modes, and report copy.
+
+## Showcase Highlights
+
+- Turns scattered map, POI, and commute data into a structured living decision.
+- Separates raw score from preference-weighted ranking, so different user priorities can be represented without rewriting the base model.
+- Uses localStorage for lightweight candidate comparison, keeping the core comparison workflow usable without login.
+- Documents the product evolution clearly: MVP → stability → judgment → comparison → public showcase.
+
+## Screenshots
+
+Screenshots are planned for the Showcase polish stage.
+
+Recommended screenshot set:
+
+- Initial search state.
+- Living conclusion card.
+- Commute recommendation.
+- POI accessibility panel.
+- Candidate list.
+- Multi-candidate comparison table.
+- Preference mode switching.
+- Copyable comparison report.
+
 ## Tech Stack
 
 - Next.js App Router
@@ -107,3 +137,16 @@ npm run build
 ## Public Release Notes
 
 Do not commit real `.env` files, local SQLite databases, `.next`, `node_modules`, or local AI/IDE configuration. Use `.env.example` as the public reference for required configuration.
+
+## Current Limitations
+
+- Candidate comparison data is stored only in the current browser.
+- SQLite is suitable for local development but should be replaced before production multi-instance deployment.
+- Route results are displayed as text but are not yet drawn as map polylines.
+- The scoring model is a first version and has not been calibrated with large-scale user feedback.
+
+## Roadmap
+
+- Showcase-3: deployment guide and Vercel readiness.
+- Showcase-4: demo polish and final showcase verification.
+- P3: account-level candidate sync, production database migration, and route visualization.
