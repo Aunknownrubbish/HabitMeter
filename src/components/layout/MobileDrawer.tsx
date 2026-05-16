@@ -12,6 +12,7 @@ import { SavedLocations } from "@/components/auth/SavedLocations";
 import { LivingSummaryCard } from "@/components/insights/LivingSummaryCard";
 import { POISummaryPanel } from "@/components/poi/POISummaryPanel";
 import { CandidatePanel } from "@/components/candidates/CandidatePanel";
+import { CandidateComparisonPanel } from "@/components/candidates/CandidateComparisonPanel";
 import { Card } from "@/components/ui/Card";
 import { POI_CATEGORIES, type POICategory, type POIItem, type CommuteResult } from "@/types";
 import { Search, BarChart3, Bus, Bookmark, ClipboardList } from "lucide-react";
@@ -34,6 +35,8 @@ interface MobileDrawerProps {
   livingScore: LivingScore | null;
   onSelectLocation: (v: { lat: number; lng: number; name: string }) => void;
   onSelectCandidate?: (candidate: CandidateLocation) => void;
+  onCandidatesChange?: () => void;
+  candidateVersion?: number;
 }
 
 const SNAP_POINTS = [0.15, 0.5, 0.9]; // peek, half, full
@@ -55,6 +58,8 @@ export function MobileDrawer({ open, onClose, ...props }: MobileDrawerProps) {
     livingScore,
     onSelectLocation,
     onSelectCandidate,
+    onCandidatesChange,
+    candidateVersion,
   } = props;
 
   const [heightRatio, setHeightRatio] = useState(SNAP_POINTS[1]);
@@ -280,7 +285,9 @@ export function MobileDrawer({ open, onClose, ...props }: MobileDrawerProps) {
                 commuteResult={commuteResult}
                 poiResults={poiResults}
                 onSelectCandidate={onSelectCandidate}
+                onCandidatesChange={onCandidatesChange}
               />
+              <CandidateComparisonPanel refreshKey={candidateVersion} />
             </div>
           )}
         </div>

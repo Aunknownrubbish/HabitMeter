@@ -30,6 +30,7 @@ interface CandidatePanelProps {
   commuteResult: CommuteResult;
   poiResults: Record<POICategory, POIItem[]>;
   onSelectCandidate?: (candidate: CandidateLocation) => void;
+  onCandidatesChange?: () => void;
 }
 
 const STATUS_OPTIONS: { value: CandidateStatus; label: string }[] = [
@@ -60,6 +61,7 @@ export function CandidatePanel({
   commuteResult,
   poiResults,
   onSelectCandidate,
+  onCandidatesChange,
 }: CandidatePanelProps) {
   const [candidates, setCandidates] = useState<CandidateLocation[]>(() =>
     loadCandidates()
@@ -90,6 +92,7 @@ export function CandidatePanel({
     });
     addCandidate(candidate);
     refreshCandidates();
+    onCandidatesChange?.();
     setTitle("");
     setNote("");
     setStatus("considering");
@@ -102,6 +105,7 @@ export function CandidatePanel({
     if (!window.confirm("确定删除这个候选地址吗？")) return;
     deleteCandidate(id);
     refreshCandidates();
+    onCandidatesChange?.();
   };
 
   const handleView = (c: CandidateLocation) => {

@@ -36,6 +36,7 @@ export default function Home() {
   });
   const [commuteLoading, setCommuteLoading] = useState(false);
   const [commuteError, setCommuteError] = useState("");
+  const [candidateVersion, setCandidateVersion] = useState(0);
 
   const handleCommuteResult = useCallback((result: Partial<CommuteResult>) => {
     setCommuteResult((prev) => ({
@@ -89,6 +90,10 @@ export default function Home() {
     setCommuteError("");
   }, []);
 
+  const handleCandidatesChange = useCallback(() => {
+    setCandidateVersion((v) => v + 1);
+  }, []);
+
   const poiCount = Object.values(poiResults).reduce(
     (sum, arr) => sum + (arr?.length ?? 0),
     0
@@ -121,6 +126,8 @@ export default function Home() {
     livingScore,
     onSelectLocation: handleSelectLocation,
     onSelectCandidate: handleSelectCandidate,
+    onCandidatesChange: handleCandidatesChange,
+    candidateVersion,
   };
 
   return (

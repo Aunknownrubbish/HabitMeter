@@ -45,7 +45,7 @@ function getDimensionScore(
   dim: ComparisonDimension
 ): number {
   if (dim === "total") return candidate.score.total;
-  return candidate.score.breakdown[dim] ?? 0;
+  return candidate.score.breakdown[dim as Exclude<ComparisonDimension, "total">] ?? 0;
 }
 
 function pickBest(

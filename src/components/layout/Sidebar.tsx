@@ -9,6 +9,7 @@ import { SavedLocations } from "@/components/auth/SavedLocations";
 import { LivingSummaryCard } from "@/components/insights/LivingSummaryCard";
 import { POISummaryPanel } from "@/components/poi/POISummaryPanel";
 import { CandidatePanel } from "@/components/candidates/CandidatePanel";
+import { CandidateComparisonPanel } from "@/components/candidates/CandidateComparisonPanel";
 import { Card } from "@/components/ui/Card";
 import { type POICategory, type POIItem, type CommuteResult } from "@/types";
 
@@ -29,6 +30,8 @@ interface SidebarProps {
   livingScore: LivingScore | null;
   onSelectLocation: (v: { lat: number; lng: number; name: string }) => void;
   onSelectCandidate?: (candidate: CandidateLocation) => void;
+  onCandidatesChange?: () => void;
+  candidateVersion?: number;
 }
 
 export function Sidebar({ className = "", ...props }: SidebarProps) {
@@ -48,6 +51,8 @@ export function Sidebar({ className = "", ...props }: SidebarProps) {
     livingScore,
     onSelectLocation,
     onSelectCandidate,
+    onCandidatesChange,
+    candidateVersion,
   } = props;
 
   return (
@@ -139,7 +144,11 @@ export function Sidebar({ className = "", ...props }: SidebarProps) {
           commuteResult={commuteResult}
           poiResults={poiResults}
           onSelectCandidate={onSelectCandidate}
+          onCandidatesChange={onCandidatesChange}
         />
+
+        {/* Candidate Comparison */}
+        <CandidateComparisonPanel refreshKey={candidateVersion} />
       </div>
     </aside>
   );
